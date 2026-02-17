@@ -22,6 +22,7 @@ interface PromiseRow {
   completedAt?: string;
   selfAssessmentNote?: string;
   peerAssessments?: Array<{ assessorId: string; assessment: string; timestamp: string }>;
+  connectedProverb?: string;
 }
 
 const STATUS_COLUMNS: Array<{ key: string; label: string }> = [
@@ -108,6 +109,7 @@ export default function PromiseBoard({ wg }: { wg: string }) {
                     workingGroup={p.workingGroup}
                     isMine={p.participantId === participantId}
                     peerAssessments={p.peerAssessments}
+                    connectedProverb={p.connectedProverb}
                     onStatusChange={
                       p.participantId === participantId
                         ? (newStatus) => handleStatusChange(p.id, newStatus)
@@ -157,6 +159,7 @@ function NewPromiseModal({
   const [description, setDescription] = useState('');
   const [relatedTopics, setRelatedTopics] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [connectedProverb, setConnectedProverb] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -175,10 +178,12 @@ function NewPromiseModal({
           .map((t) => t.trim())
           .filter(Boolean),
         dueDate: dueDate.trim() || undefined,
+        connectedProverb: connectedProverb.trim() || undefined,
       });
       setDescription('');
       setRelatedTopics('');
       setDueDate('');
+      setConnectedProverb('');
       onCreated();
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed to create promise');
@@ -236,6 +241,19 @@ function NewPromiseModal({
             onChange={(e) => setDueDate(e.target.value)}
             className="w-full rounded border border-[var(--border)] bg-[var(--bg-tertiary)] px-3 py-2 text-sm"
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Connect proverb (optional)</label>
+          <textarea
+            value={connectedProverb}
+            onChange={(e) => setConnectedProverb(e.target.value)}
+            rows={2}
+            className="w-full rounded border border-[var(--border)] bg-[var(--bg-tertiary)] px-3 py-2 text-sm"
+            placeholder="A proverb that captures your understanding behind this commitment..."
+          />
+          <p className="text-xs text-[var(--text-muted)] mt-0.5">
+            Links proof of understanding (proverb) to the promise (action). Strengthens the trust graph.
+          </p>
         </div>
         {err && <p className="text-sm text-[var(--wg-cyber)]">{err}</p>}
         <div className="flex gap-2 justify-end">

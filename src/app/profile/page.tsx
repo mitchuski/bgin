@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { localDB } from '@/lib/storage/local';
 import type { AgentCard } from '@/lib/ceremony/agentCard';
-import { getParticipantId } from '@/lib/swordsman/signedFetch';
+import { getParticipantId, signedFetch } from '@/lib/swordsman/signedFetch';
 
 const WG_EMOJI: Record<string, string> = {
   ikp: '🔐',
@@ -14,10 +14,33 @@ const WG_EMOJI: Record<string, string> = {
   governance: '🏛️',
 };
 
+interface ProverbRow {
+  id: string;
+  workingGroup: string;
+  content: string;
+  sourceType: string;
+  createdAt: string;
+}
+
+interface CastRow {
+  id: string;
+  sessionTitle: string;
+  workingGroup: string;
+  mageQuery: string;
+  mageResponse: string;
+  addedAt: string;
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const [card, setCard] = useState<AgentCard | null>(null);
   const [loading, setLoading] = useState(true);
+  const [myProverbsExpanded, setMyProverbsExpanded] = useState(false);
+  const [myCastsExpanded, setMyCastsExpanded] = useState(false);
+  const [myProverbs, setMyProverbs] = useState<ProverbRow[]>([]);
+  const [myCasts, setMyCasts] = useState<CastRow[]>([]);
+  const [proverbsLoading, setProverbsLoading] = useState(false);
+  const [castsLoading, setCastsLoading] = useState(false);
 
   useEffect(() => {
     getParticipantId().then((id) => {
@@ -32,6 +55,40 @@ export default function ProfilePage() {
       });
     });
   }, [router]);
+
+  const fetchMyProverbs = useCallback(async () => {
+    setProverbsLoading(true);
+    try {
+      const res = await signedFetch('/api/proverbs?mine=1&limit=30', { method: 'GET' });
+      const data = await res.json();
+      setMyProverbs(data.proverbs ?? []);
+    } catch {
+      setMyProverbs([]);
+    } finally {
+      setProverbsLoading(false);
+    }
+  }, []);
+
+  const fetchMyCasts = useCallback(async () => {
+    setCastsLoading(true);
+    try {
+      const res = await signedFetch('/api/spellbook/entries?mine=1', { method: 'GET' });
+      const data = await res.json();
+      setMyCasts(data.entries ?? []);
+    } catch {
+      setMyCasts([]);
+    } finally {
+      setCastsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (myProverbsExpanded) fetchMyProverbs();
+  }, [myProverbsExpanded, fetchMyProverbs]);
+
+  useEffect(() => {
+    if (myCastsExpanded) fetchMyCasts();
+  }, [myCastsExpanded, fetchMyCasts]);
 
   if (loading) {
     return (
@@ -88,6 +145,100 @@ export default function ProfilePage() {
           <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide">Privacy</p>
           <p className="text-sm text-[var(--text-secondary)]">Attribution: {card.privacy.attributionLevel}</p>
         </div>
+      </div>
+
+      {/* My proverbs — expandable */}
+      <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setMyProverbsExpanded((e) => !e)}
+          className="w-full px-4 py-3 flex items-center justify-between gap-2 text-left bg-[var(--bg-tertiary)] hover:bg-[var(--bg-secondary)] transition-colors border-b border-[var(--border)]"
+        >
+          <h2 className="font-semibold text-[var(--text-primary)]">✦ My proverbs</h2>
+          <span className="text-[var(--text-muted)]" aria-hidden>{myProverbsExpanded ? '▼' : '▶'}</span>
+        </button>
+        {myProverbsExpanded && (
+          <div className="p-4 max-h-[24rem] overflow-y-auto">
+            {proverbsLoading ? (
+              <p className="text-sm text-[var(--text-muted)]">Loading…</p>
+            ) : myProverbs.length === 0 ? (
+              <p className="text-sm text-[var(--text-muted)]">No proverbs yet. Inscribe from a Mage response or on a cast in the Spellbook.</p>
+            ) : (
+              <ul className="space-y-3">
+                {myProverbs.map((p) => (
+                  <li key={p.id} className="rounded-lg border border-[var(--border)] p-3 bg-[var(--bg-primary)]">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span>{WG_EMOJI[p.workingGroup] ?? '📄'}</span>
+                      <span className="text-xs text-[var(--text-muted)] uppercase">{p.workingGroup}</span>
+                      <span className="text-xs text-[var(--text-muted)]">{new Date(p.createdAt).toLocaleString()}</span>
+                    </div>
+                    <p className="text-sm text-[var(--text-primary)] whitespace-pre-wrap">{p.content}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {myProverbs.length > 0 && (
+              <Link href="/proverb" className="text-sm text-[var(--mage)] hover:underline mt-3 inline-block">View all proverbs →</Link>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* My casts — expandable */}
+      <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setMyCastsExpanded((e) => !e)}
+          className="w-full px-4 py-3 flex items-center justify-between gap-2 text-left bg-[var(--bg-tertiary)] hover:bg-[var(--bg-secondary)] transition-colors border-b border-[var(--border)]"
+        >
+          <h2 className="font-semibold text-[var(--text-primary)]">🔮 My casts</h2>
+          <span className="text-[var(--text-muted)]" aria-hidden>{myCastsExpanded ? '▼' : '▶'}</span>
+        </button>
+        {myCastsExpanded && (
+          <div className="p-4 max-h-[24rem] overflow-y-auto">
+            {castsLoading ? (
+              <p className="text-sm text-[var(--text-muted)]">Loading…</p>
+            ) : myCasts.length === 0 ? (
+              <p className="text-sm text-[var(--text-muted)]">No casts yet. Use Cast to session or Cast to spellbook in a Mage chat.</p>
+            ) : (
+              <ul className="space-y-4">
+                {myCasts.map((e) => (
+                  <li key={e.id} className="rounded-lg border border-[var(--border)] p-3 bg-[var(--bg-primary)]">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span>{WG_EMOJI[e.workingGroup] ?? '📄'}</span>
+                      <span className="text-xs text-[var(--text-muted)]">{e.sessionTitle}</span>
+                      <span className="text-xs text-[var(--text-muted)]">{new Date(e.addedAt).toLocaleString()}</span>
+                    </div>
+                    <p className="text-xs font-medium text-[var(--mage)] mb-1">Q: {e.mageQuery.length > 60 ? e.mageQuery.slice(0, 60) + '…' : e.mageQuery}</p>
+                    <p className="text-sm text-[var(--text-secondary)] line-clamp-2">{e.mageResponse.slice(0, 160)}{e.mageResponse.length > 160 ? '…' : ''}</p>
+                    <Link href="/spellbook" className="text-xs text-[var(--mage)] hover:underline mt-2 inline-block">Open Spellbook →</Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {myCasts.length > 0 && (
+              <Link href="/spellbook" className="text-sm text-[var(--mage)] hover:underline mt-3 inline-block">View Spellbook →</Link>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="mt-8 rounded-lg border border-[var(--border)] p-6 bg-[var(--bg-secondary)]">
+        <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">Community</h2>
+        <p className="text-sm text-[var(--text-secondary)] mb-3">
+          Join the BGIN Forum to discuss working groups, Block 14, and blockchain governance with the network.
+        </p>
+        <a
+          href="https://bgin.discourse.group/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] bg-[var(--bg-tertiary)] hover:border-[var(--mage)] hover:text-[var(--mage)] transition-colors"
+        >
+          Open BGIN Forum →
+        </a>
+        <p className="text-xs text-[var(--text-muted)] mt-2">
+          <a href="https://bgin.discourse.group/" target="_blank" rel="noopener noreferrer" className="hover:underline">bgin.discourse.group</a>
+        </p>
       </div>
       <div className="mt-8">
         <h2 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-3">Settings</h2>

@@ -35,6 +35,11 @@ export default function MageChat({ wg, embedded }: { wg: string; embedded?: bool
   const [castSpellbookLoading, setCastSpellbookLoading] = useState(false);
   const [castSpellbookSuccess, setCastSpellbookSuccess] = useState<string | null>(null);
   const [castMessageIndices, setCastMessageIndices] = useState<number[]>([]);
+  const [useRpp, setUseRpp] = useState(false);
+  const [inscribeProverbIndex, setInscribeProverbIndex] = useState<number | null>(null);
+  const [inscribeProverbText, setInscribeProverbText] = useState('');
+  const [inscribeProverbLoading, setInscribeProverbLoading] = useState(false);
+  const [inscribeProverbSuccess, setInscribeProverbSuccess] = useState<string | null>(null);
 
   const loadEpisodicContext = useCallback(async () => {
     const ctx = await getEpisodicContextForPrompt(wg, 10);
@@ -77,6 +82,7 @@ export default function MageChat({ wg, embedded }: { wg: string; embedded?: bool
           allowEpisodicMemory: prefs?.allowEpisodicMemory ?? true,
         },
         episodicContext,
+        useRpp,
       };
 
       const res = await signedFetch(`/api/mage/${wg}/chat`, {
@@ -205,6 +211,34 @@ export default function MageChat({ wg, embedded }: { wg: string; embedded?: bool
     }
   }, [castSpellbookModalIndex, messages]);
 
+  const inscribeProverb = useCallback(async () => {
+    if (inscribeProverbIndex == null || !inscribeProverbText.trim()) return;
+    setInscribeProverbLoading(true);
+    setInscribeProverbSuccess(null);
+    try {
+      const res = await signedFetch('/api/proverbs', {
+        method: 'POST',
+        body: JSON.stringify({
+          content: inscribeProverbText.trim(),
+          workingGroup: wg,
+          sourceType: 'mage_response',
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setInscribeProverbSuccess('Proverb inscribed.');
+        setInscribeProverbText('');
+        setTimeout(() => { setInscribeProverbIndex(null); setInscribeProverbSuccess(null); }, 2000);
+      } else {
+        setInscribeProverbSuccess(data.message ?? 'Failed to inscribe');
+      }
+    } catch (e) {
+      setInscribeProverbSuccess(e instanceof Error ? e.message : 'Failed to inscribe');
+    } finally {
+      setInscribeProverbLoading(false);
+    }
+  }, [inscribeProverbIndex, inscribeProverbText, wg]);
+
   return (
     <div className={embedded ? 'flex flex-col flex-1 min-h-0' : 'flex flex-col h-[calc(100vh-8rem)] max-w-4xl mx-auto'}>
       {!embedded && (
@@ -260,45 +294,64 @@ export default function MageChat({ wg, embedded }: { wg: string; embedded?: bool
             )}
             {m.role === 'mage' && (
               <div className="mt-2 ml-2">
-                {castMessageIndices.includes(i) ? (
-                  <span className="text-xs text-[var(--text-muted)]">Already cast</span>
-                ) : (
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <button
-                      type="button"
-                      onClick={() => openCastModal(i)}
-                      className="text-xs text-[var(--mage)] hover:underline"
-                    >
-                      🔮 Cast to session
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => openCastSpellbookModal(i)}
-                      className="text-xs text-[var(--mage)] hover:underline"
-                    >
-                      📜 Cast to spellbook
-                    </button>
-                  </div>
-                )}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  {!castMessageIndices.includes(i) && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => openCastModal(i)}
+                        className="text-xs text-[var(--mage)] hover:underline"
+                      >
+                        🔮 Cast to session
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openCastSpellbookModal(i)}
+                        className="text-xs text-[var(--mage)] hover:underline"
+                      >
+                        📜 Cast to spellbook
+                      </button>
+                    </>
+                  )}
+                  {castMessageIndices.includes(i) && <span className="text-xs text-[var(--text-muted)]">Already cast</span>}
+                  <button
+                    type="button"
+                    onClick={() => { setInscribeProverbIndex(i); setInscribeProverbText(''); setInscribeProverbSuccess(null); }}
+                    className="text-xs text-[var(--mage)] hover:underline"
+                  >
+                    ✦ Inscribe proverb
+                  </button>
+                </div>
               </div>
             )}
           </div>
         ))}
         {loading && <MessageBubble role="mage" content="…" />}
       </div>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-          placeholder="Ask the Mage…"
-          className="flex-1 rounded border border-[var(--border)] bg-[var(--bg-tertiary)] px-4 py-2 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--mage)] focus:outline-none"
-          disabled={loading}
-        />
-        <Button onClick={sendMessage} disabled={loading || !input.trim()}>
-          {loading ? '…' : 'Send'}
-        </Button>
+      <div className="space-y-2">
+        <label className="flex items-center gap-2 text-xs text-[var(--text-muted)] cursor-pointer">
+          <input
+            type="checkbox"
+            checked={useRpp}
+            onChange={(e) => setUseRpp(e.target.checked)}
+            className="rounded border-[var(--border)]"
+          />
+          Use RPP (Relationship Proverb Protocol): Mage will first divine a proverb connecting your context to the tale, then respond.
+        </label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+            placeholder="Ask the Mage…"
+            className="flex-1 rounded border border-[var(--border)] bg-[var(--bg-tertiary)] px-4 py-2 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--mage)] focus:outline-none"
+            disabled={loading}
+          />
+          <Button onClick={sendMessage} disabled={loading || !input.trim()}>
+            {loading ? '…' : 'Send'}
+          </Button>
+        </div>
       </div>
 
       <Modal
@@ -370,6 +423,39 @@ export default function MageChat({ wg, embedded }: { wg: string; embedded?: bool
               <span className="font-medium">{g.label} Spellbook</span>
             </button>
           ))}
+        </div>
+      </Modal>
+
+      <Modal
+        open={inscribeProverbIndex !== null}
+        onClose={() => { setInscribeProverbIndex(null); setInscribeProverbText(''); setInscribeProverbSuccess(null); }}
+        title="✦ Inscribe proverb"
+      >
+        <p className="text-sm text-[var(--text-secondary)] mb-3">
+          Inscribe a proverb from this Mage response. It will appear in the Proverb feed and can inform the promise and trust graphs.
+        </p>
+        {inscribeProverbSuccess && <p className="text-sm mb-3 text-[var(--mage)]">{inscribeProverbSuccess}</p>}
+        <textarea
+          value={inscribeProverbText}
+          onChange={(e) => setInscribeProverbText(e.target.value)}
+          placeholder="Your proverb…"
+          rows={3}
+          className="w-full rounded border border-[var(--border)] bg-[var(--bg-primary)] px-3 py-2 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--mage)] focus:outline-none resize-y"
+          disabled={inscribeProverbLoading}
+        />
+        <div className="mt-3 flex justify-end gap-2">
+          <Button
+            variant="secondary"
+            onClick={() => { setInscribeProverbIndex(null); setInscribeProverbText(''); setInscribeProverbSuccess(null); }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={inscribeProverb}
+            disabled={inscribeProverbLoading || !inscribeProverbText.trim()}
+          >
+            {inscribeProverbLoading ? '…' : 'Inscribe'}
+          </Button>
         </div>
       </Modal>
     </div>

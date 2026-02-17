@@ -9,15 +9,22 @@ import {
   getParticipant,
   type SpellbookEntryRow,
 } from '@/lib/storage/server-store';
-import { verifyRequest } from '@/lib/auth/middleware';
+import { verifyRequest, verifyRequestNoBody } from '@/lib/auth/middleware';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const sessionId = searchParams.get('sessionId') ?? undefined;
   const workingGroup = searchParams.get('workingGroup') ?? undefined;
+  const mine = searchParams.get('mine') === '1' || searchParams.get('mine') === 'true';
+
+  let participantId: string | undefined;
+  if (mine) {
+    const auth = await verifyRequestNoBody(request);
+    if (auth.valid) participantId = auth.participantId;
+  }
 
   try {
-    const entries = await listSpellbookEntries(sessionId, workingGroup);
+    const entries = await listSpellbookEntries(sessionId, workingGroup, participantId);
     return NextResponse.json({ entries });
   } catch (e) {
     console.error('Failed to list spellbook entries:', e);

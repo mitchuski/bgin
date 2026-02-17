@@ -20,6 +20,7 @@ function canonicalPromisePayload(body: {
   description: string;
   relatedTopics: string[];
   dueDate?: string | null;
+  connectedProverb?: string | null;
 }): string {
   return JSON.stringify({
     workingGroup: body.workingGroup,
@@ -27,6 +28,7 @@ function canonicalPromisePayload(body: {
     description: body.description,
     relatedTopics: [...(body.relatedTopics ?? [])].sort(),
     dueDate: body.dueDate ?? null,
+    connectedProverb: body.connectedProverb ?? null,
   });
 }
 
@@ -71,6 +73,7 @@ export async function POST(request: Request) {
     description?: string;
     relatedTopics?: string[];
     dueDate?: string;
+    connectedProverb?: string;
     signature?: string;
   };
   try {
@@ -119,12 +122,15 @@ export async function POST(request: Request) {
     );
   }
 
+  const connectedProverb = typeof body.connectedProverb === 'string' ? body.connectedProverb.trim() || undefined : undefined;
+
   const payload = canonicalPromisePayload({
     workingGroup,
     type: body.type!,
     description,
     relatedTopics,
     dueDate: body.dueDate ?? null,
+    connectedProverb: connectedProverb ?? null,
   });
   const sigValid = await verifySignature(participant.publicKeyHex, payload, signature);
   if (!sigValid) {
@@ -148,6 +154,7 @@ export async function POST(request: Request) {
     createdAt: now,
     signature,
     peerAssessments: [],
+    connectedProverb,
   };
   await addPromise(row);
   return NextResponse.json({ id, createdAt: now }, { status: 201 });

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getParticipantId } from '@/lib/swordsman/signedFetch';
 import RecentCastsFeed from '@/components/workspace/RecentCastsFeed';
+import InscribeProverbButton from '@/components/shared/InscribeProverbButton';
 import { BLOCK14_TIMETABLE, BLOCK14_WORKING_GROUPS, getSessionsByDay } from '@/lib/block14/sessions';
 
 interface SpellbookEntry {
@@ -186,6 +187,9 @@ function SpellbookContent() {
                         <div className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap mb-3">{e.mageResponse}</div>
                         {e.sources?.length > 0 && <div className="text-xs text-[var(--text-muted)]">Sources: {e.sources.map((s) => s.documentTitle).join(', ')}</div>}
                         {e.crossWgRefs?.length > 0 && <div className="text-xs text-[var(--text-muted)] mt-1">Cross-WG: {e.crossWgRefs.map((r) => r.workingGroup).join(', ')}</div>}
+                        <div className="mt-3 pt-2 border-t border-[var(--border)]">
+                          <InscribeProverbButton castEntryId={e.id} workingGroup={e.workingGroup} />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -242,6 +246,9 @@ function SpellbookContent() {
                         <div className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap mb-3">{e.mageResponse}</div>
                         {e.sources?.length > 0 && <div className="text-xs text-[var(--text-muted)]">Sources: {e.sources.map((s) => s.documentTitle).join(', ')}</div>}
                         {e.crossWgRefs?.length > 0 && <div className="text-xs text-[var(--text-muted)] mt-1">Cross-WG: {e.crossWgRefs.map((r) => r.workingGroup).join(', ')}</div>}
+                        <div className="mt-3 pt-2 border-t border-[var(--border)]">
+                          <InscribeProverbButton castEntryId={e.id} workingGroup={e.workingGroup} />
+                        </div>
                       </div>
                     ))}
                   </div>

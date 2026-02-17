@@ -69,6 +69,8 @@ export interface PromiseRow {
   selfAssessmentNote?: string;
   signature: string;
   peerAssessments: Array<{ assessorId: string; assessment: 'verified' | 'partial' | 'not_verified'; timestamp: string }>;
+  /** Optional proverb connecting proof of understanding to this promise (RPP). */
+  connectedProverb?: string;
 }
 
 // Block14 Spellbook - aggregated Mage contributions per session
@@ -87,12 +89,27 @@ export interface SpellbookEntryRow {
   attributionLevel: 'full' | 'role_only' | 'anonymous';
 }
 
+/** RPP / Relationship Proverb Protocol — proverbs link to Mage responses or casts; feed informs promise/trust graph. */
+export type ProverbSourceType = 'mage_response' | 'cast_inscription' | 'cast_agreement';
+
+export interface ProverbRow {
+  id: string;
+  participantId: string;
+  workingGroup: string;
+  content: string;
+  sourceType: ProverbSourceType;
+  /** Spellbook entry id when sourceType is cast_inscription or cast_agreement; optional for mage_response. */
+  castEntryId?: string;
+  createdAt: string;
+}
+
 interface Store {
   participants: ParticipantRow[];
   agreementRecords: AgreementRecordRow[];
   sessions: SessionRow[];
   promises: PromiseRow[];
   spellbookEntries: SpellbookEntryRow[];
+  proverbs: ProverbRow[];
 }
 
 const emptyStore: Store = {
@@ -101,6 +118,7 @@ const emptyStore: Store = {
   sessions: [],
   promises: [],
   spellbookEntries: [],
+  proverbs: [],
 };
 
 async function load(): Promise<Store> {
@@ -113,6 +131,7 @@ async function load(): Promise<Store> {
       sessions: parsed.sessions ?? emptyStore.sessions,
       promises: parsed.promises ?? emptyStore.promises,
       spellbookEntries: parsed.spellbookEntries ?? emptyStore.spellbookEntries,
+      proverbs: parsed.proverbs ?? emptyStore.proverbs,
     };
   } catch {
     return { ...emptyStore };
@@ -281,12 +300,17 @@ export async function getOrCreateSession(
 }
 
 // Block14 Spellbook functions
-export async function listSpellbookEntries(sessionId?: string, workingGroup?: string): Promise<SpellbookEntryRow[]> {
+export async function listSpellbookEntries(
+  sessionId?: string,
+  workingGroup?: string,
+  participantId?: string
+): Promise<SpellbookEntryRow[]> {
   const store = await load();
   let list = store.spellbookEntries;
   if (sessionId) list = list.filter((e) => e.sessionId === sessionId);
   if (workingGroup) list = list.filter((e) => e.workingGroup === workingGroup);
-  return list;
+  if (participantId) list = list.filter((e) => e.participantId === participantId);
+  return list.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
 }
 
 export async function listSpellbookSessions(): Promise<
@@ -318,4 +342,32 @@ export async function addSpellbookEntry(entry: SpellbookEntryRow): Promise<void>
 export async function getSpellbookEntry(id: string): Promise<SpellbookEntryRow | null> {
   const store = await load();
   return store.spellbookEntries.find((e) => e.id === id) ?? null;
+}
+
+// Proverbs (RPP — Relationship Proverb Protocol)
+export async function listProverbs(options?: {
+  workingGroup?: string;
+  castEntryId?: string;
+  sourceType?: ProverbSourceType;
+  participantId?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<ProverbRow[]> {
+  const store = await load();
+  let list = [...store.proverbs].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+  if (options?.workingGroup) list = list.filter((p) => p.workingGroup === options.workingGroup);
+  if (options?.castEntryId) list = list.filter((p) => p.castEntryId === options.castEntryId);
+  if (options?.sourceType) list = list.filter((p) => p.sourceType === options.sourceType);
+  if (options?.participantId) list = list.filter((p) => p.participantId === options.participantId);
+  const offset = options?.offset ?? 0;
+  const limit = options?.limit ?? 50;
+  return list.slice(offset, offset + limit);
+}
+
+export async function addProverb(row: ProverbRow): Promise<void> {
+  const store = await load();
+  store.proverbs.push(row);
+  await save(store);
 }

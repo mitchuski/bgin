@@ -13,6 +13,7 @@ function canonicalCreatePayload(o: {
   description: string;
   relatedTopics: string[];
   dueDate?: string | null;
+  connectedProverb?: string | null;
 }): string {
   return JSON.stringify({
     workingGroup: o.workingGroup,
@@ -20,6 +21,7 @@ function canonicalCreatePayload(o: {
     description: o.description,
     relatedTopics: [...(o.relatedTopics ?? [])].sort(),
     dueDate: o.dueDate ?? null,
+    connectedProverb: o.connectedProverb ?? null,
   });
 }
 
@@ -29,6 +31,8 @@ export interface CreatePromiseInput {
   description: string;
   relatedTopics?: string[];
   dueDate?: string;
+  /** Optional proverb connecting proof of understanding to this promise (RPP). */
+  connectedProverb?: string;
 }
 
 export async function createPromise(input: CreatePromiseInput): Promise<{ id: string; createdAt: string }> {
@@ -44,6 +48,7 @@ export async function createPromise(input: CreatePromiseInput): Promise<{ id: st
     description: input.description,
     relatedTopics: input.relatedTopics ?? [],
     dueDate: input.dueDate ?? null,
+    connectedProverb: input.connectedProverb ?? null,
   });
   const signature = await signData(keys.privateKey, payload);
   const body = {
@@ -52,6 +57,7 @@ export async function createPromise(input: CreatePromiseInput): Promise<{ id: st
     description: input.description,
     relatedTopics: input.relatedTopics ?? [],
     dueDate: input.dueDate ?? undefined,
+    connectedProverb: input.connectedProverb ?? undefined,
     signature,
   };
   const res = await signedFetch('/api/promises', { method: 'POST', body: JSON.stringify(body) });

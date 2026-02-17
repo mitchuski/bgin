@@ -29,6 +29,8 @@ export interface PromiseCardProps {
   workingGroup: string;
   isMine?: boolean;
   peerAssessments?: Array<{ assessment: string }>;
+  /** Proverb connecting proof of understanding to this promise (RPP). */
+  connectedProverb?: string;
   onStatusChange?: (newStatus: 'in_progress' | 'completed') => void;
   onAssess?: () => void;
 }
@@ -42,6 +44,7 @@ export default function PromiseCard({
   workingGroup,
   isMine,
   peerAssessments = [],
+  connectedProverb,
   onStatusChange,
 }: PromiseCardProps) {
   const verifiedCount = peerAssessments.filter((a) => a.assessment === 'verified').length;
@@ -52,6 +55,11 @@ export default function PromiseCard({
         <WGBadge wg={workingGroup} emoji={WG_EMOJI[workingGroup] ?? '📄'} />
       </div>
       <p className="text-sm break-words">{description}</p>
+      {connectedProverb && (
+        <blockquote className="text-xs text-[var(--mage)] border-l-2 border-[var(--mage)]/50 pl-2 mt-2 italic">
+          ✦ {connectedProverb}
+        </blockquote>
+      )}
       {dueDate && (
         <p className="text-xs text-[var(--text-muted)] mt-1">Due: {dueDate}</p>
       )}

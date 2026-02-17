@@ -53,6 +53,7 @@ export default function Header() {
       <nav className="flex flex-wrap gap-3 text-sm items-center">
         <Link href="/" className="font-bold text-[var(--text-primary)] hover:text-[var(--mage)]">Block 14</Link>
         <Link href="/spellbook" className="inline-flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--mage)]">🔮 Spellbook</Link>
+        <Link href="/proverb" className="inline-flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--mage)]">✦ Proverbs</Link>
         <Link href="/promises" className="inline-flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--mage)]">🤝 Promises</Link>
         <Link
           href="/mage"

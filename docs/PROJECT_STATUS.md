@@ -19,9 +19,12 @@ Quick reference for where the UI hits APIs and what can fail.
 | **Dashboard** | GET `/api/curation/feed?workingGroups=...&limit=10&offset=0` | Yes (signedFetch) | Redirects to ceremony if no agent card. |
 | **Dashboard → Briefing** | GET `/api/curation/briefing?meetingId=...` | Yes | Stub sections per WG. |
 | **Dashboard → Knowledge map** | None (client-only) | No | Uses `buildLocalKnowledgeMap()` from IndexedDB. |
-| **Mage chat** | POST `/api/mage/[wg]/chat` | Yes | Uses **NEAR Cloud AI** (preferred) or Anthropic. Set `NEAR_AI_API_KEY` or `ANTHROPIC_API_KEY` in `.env`. |
-| **Workspace → Promise board** | GET `/api/promises?wg=...` | Yes | Lists promises. |
-| **Promise board** | POST `/api/promises`, PATCH `/api/promises/[id]`, POST `/api/promises/[id]/assess` | Yes | Via `lib/promises/client.ts` (signed body + auth headers). |
+| **Mage chat** | POST `/api/mage/[wg]/chat` | Yes | Body may include `useRpp: true` for RPP (proverb then response). NEAR Cloud AI or Anthropic. |
+| **Spellbook** | GET `/api/spellbook/entries` | No (or Yes for `?mine=1`) | List entries; `mine=1` with auth returns current participant’s casts. |
+| **Proverbs** (`/proverb`) | GET `/api/proverbs`, POST `/api/proverbs` | GET no auth; POST yes | Feed; optional `mine=1` with auth for “My proverbs”. Inscribe from Mage or on cast. |
+| **Profile → My proverbs / My casts** | GET `/api/proverbs?mine=1`, GET `/api/spellbook/entries?mine=1` | Yes | signedFetch; expandable sections load when opened. |
+| **Workspace → Promise board** | GET `/api/promises?wg=...` | Yes | Lists promises (optional `connectedProverb` on each). |
+| **Promise board** | POST `/api/promises`, PATCH `/api/promises/[id]`, POST `/api/promises/[id]/assess` | Yes | Create can include `connectedProverb`. Via `lib/promises/client.ts`. |
 | **Trust** (`/trust`) | None in UI | — | Page is static; Phase 8 stubs exist at `/api/trust/*`. |
 
 ---

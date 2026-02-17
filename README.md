@@ -9,9 +9,11 @@ Governance intelligence for the BGIN constellation: **Three Graphs, One Identity
 - **Block 14** — Homepage with timetable (March 1–2, 2026), links into sessions and Spellbook; Get started and promise/cast feeds on the side.
 - **Ceremony** — 8-step key ceremony: keygen, privacy preferences, MyTerms, working-group selection, agent card. Completing it gives you a Swordsman-style identity and unlocks Mages, Spellbook, and promises.
 - **Archive** — Knowledge tab: Talk to a Mage (by WG), Block 14 briefings, Knowledge map, and **Spells** (BGIN publications & projects from [bgin-global.org/projects](https://bgin-global.org/projects)), sorted by most recent.
-- **Spellbook** — Promises, **Sessions** (cast by timetable session), **Spellbooks** (by working group), and **Recent casts**; all sections expandable. Casts come from Mage chat (Cast to session / Cast to spellbook).
-- **Mage** — WG-specific chat (IKP, FASE, Cyber, Governance). Open via the **🧙** header button (side panel) or from Archive. One cast per response (to a session or to a WG spellbook).
-- **Promises** — Single `/promises` page for all WGs; voluntary commitments and assessment flows.
+- **Spellbook** — Promises, **Sessions** (cast by timetable session), **Spellbooks** (by working group), and **Recent casts**; all sections expandable. Casts come from Mage chat (Cast to session / Cast to spellbook). Each cast can have **✦ Inscribe proverb** to agree or add a proverb.
+- **Mage** — WG-specific chat (IKP, FASE, Cyber, Governance). Open via the **🧙** header button (side panel) or from Archive. Optional **RPP** (Relationship Proverb Protocol): Mage first divines a proverb connecting your context to the tale, then responds. After each reply: **Cast to session**, **Cast to spellbook**, or **✦ Inscribe proverb**.
+- **Proverbs** (`/proverb`) — Feed of proverbs (from Mage inscriptions, or inscribed on casts). Filters by WG. Connects proof of understanding to the knowledge-sharing system; proverbs linked to casts and promises strengthen the trust graph.
+- **Promises** — Single `/promises` page for all WGs; voluntary commitments and assessment flows. When creating a promise you can optionally **connect a proverb** (proof of understanding) to the commitment; it appears on the promise card and is signed with the promise.
+- **Profile** — Swordsman identity, working groups, **My proverbs** and **My casts** (expandable), Community (Discourse), Settings.
 
 The **implementation flow** (phases from the master plan) is **mid–working**: core ceremony, Mage chat, Spellbook, promises, and Archive are in place; trust graph, full MyTerms wiring, and some integrations are still in progress or stubbed.
 
@@ -79,10 +81,11 @@ src/
     ceremony/             # Key ceremony
     mage/, mage/[wg]/     # Archive hub + WG chat
     spellbook/            # Sessions, by-WG spellbooks, recent casts, promises strip
+    proverb/              # Proverbs feed (RPP)
     promises/             # All-WG promises
     dashboard/            # Briefing, knowledge map (also linked from Archive)
     workspace/, profile/, trust/, settings/
-    api/                  # ceremony/register, mage/[wg]/chat, spellbook/entries, promises, etc.
+    api/                  # ceremony/register, mage/[wg]/chat, spellbook/entries, proverbs, promises, etc.
   lib/
     ceremony/             # keygen, agentCard, privacy, wgSelection
     storage/              # local (Dexie), server-store, collaborative-sessions
@@ -115,6 +118,7 @@ npm run start
 
 - **docs/PROJECT_STATUS.md** — What’s connected, API ↔ UI map, where it can break  
 - **docs/DEMO_FLOW.md** — Demo order and quick path  
+- **docs/KNOWLEDGE_SHARING_AND_RPP.md** — Proverbs, RPP flow, and knowledge sharing  
 - **docs/README.md** — Pointer to block14_updates and 00  
 - **BLOCK_14_ALIGNMENT_COMPARISON.md** — Alignment with agentprivacy / Block 14 spec  
 - **BLOCK13_KNOWLEDGE_ARCHIVES.md** — Knowledge base context for ingestion  

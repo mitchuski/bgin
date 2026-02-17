@@ -67,11 +67,15 @@ export async function POST(
     );
   }
 
+  const RPP_INSTRUCTION = `
+[Relationship Proverb Protocol (RPP): Before responding to any inquiry about this story, you must first divine a proverb connecting the seeker's context to this tale. Only then may you speak. If RPP is requested, begin your reply with a short proverb in brackets, e.g. [RPP Proverb: ...], then continue with your full response.]`;
+
   let body: {
     message?: string;
     conversationHistory?: Array<{ role: string; content: string; timestamp?: string }>;
     participantContext?: { allowEpisodicMemory?: boolean };
     episodicContext?: Array<{ topic?: string; summary?: string }>;
+    useRpp?: boolean;
   };
   try {
     body = JSON.parse(bodyText);
@@ -96,12 +100,15 @@ export async function POST(
   ).filter(Boolean);
 
   const context = await retrieveContext(wg, message, body.participantContext);
-  const systemPrompt = buildSystemPrompt(
+  let systemPrompt = buildSystemPrompt(
     wg,
     context.chunks,
     episodicMemory,
     context.crossWgReferences
   );
+  if (body.useRpp === true) {
+    systemPrompt += RPP_INSTRUCTION;
+  }
 
   const messages = [
     ...conversationHistory

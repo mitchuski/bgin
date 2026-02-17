@@ -16,10 +16,12 @@ Implementation flow **mid–working**: Block 14 homepage, Ceremony, Mage (side p
 - **Block 14 homepage**: Timetable (March 1–2, 2026), Get started, promise feed, cast feed; links to Spellbook by session.
 - **Ceremony**: 8-step key ceremony (keygen, privacy, MyTerms, WG selection, agent card); keys and identity in IndexedDB; `POST /api/ceremony/register`.
 - **Archive** (`/mage`): Talk to a Mage by WG (IKP, FASE, Cyber, Governance), Block 14 briefings, Knowledge map, **Spells** (BGIN publications/projects from bgin-global.org/projects, newest first).
-- **Spellbook** (`/spellbook`): Promises strip; Cast to session (timetable); Spellbook by working group; Recent casts; all expandable. Single timetable source in `src/lib/block14/sessions.ts`.
-- **Mage**: Side panel (🧙 in header) with WG selector and MageChat; one cast per response (to session or to WG spellbook). Full-page Mage at `/mage/[wg]`.
-- **Promises** (`/promises`): Single page for all WGs; promise board and assessment flows; signed API.
-- **APIs**: `/api/ceremony/register`, `/api/mage/[wg]/chat`, `/api/curation/feed`, `/api/curation/briefing`, `/api/spellbook/entries`, `/api/spellbook/sessions`, `/api/promises`, `/api/sessions`, collaborative session contribute.
+- **Spellbook** (`/spellbook`): Promises strip; Cast to session (timetable); Spellbook by working group; Recent casts; all expandable. **✦ Inscribe proverb** on each cast to agree or add a proverb linked to that cast. Single timetable source in `src/lib/block14/sessions.ts`.
+- **Mage**: Side panel (🧙 in header) with WG selector and MageChat; one cast per response (to session or to WG spellbook). **RPP (Relationship Proverb Protocol)**: optional “Use RPP” checkbox—Mage first divines a proverb connecting context to the tale, then responds. **✦ Inscribe proverb** after any reply. Full-page Mage at `/mage/[wg]`.
+- **Proverbs** (`/proverb`): Proverbs feed; filter by WG. Proverbs from Mage inscriptions or inscribed on casts; connect proof of understanding to knowledge sharing. **docs/KNOWLEDGE_SHARING_AND_RPP.md** describes the RPP flow and how proverbs feed the trust graph.
+- **Promises** (`/promises`): Single page for all WGs; promise board and assessment flows. **Connect proverb** when creating a promise (optional)—links understanding to the commitment; shown on promise card and signed with the promise. Signed API.
+- **Profile**: Expandable **✦ My proverbs** and **🔮 My casts** (authenticated); Community (Discourse); Settings.
+- **APIs**: `/api/ceremony/register`, `/api/mage/[wg]/chat`, `/api/curation/feed`, `/api/curation/briefing`, `/api/spellbook/entries`, `/api/spellbook/sessions`, `/api/proverbs` (GET/POST, optional `mine=1`), `/api/promises`, `/api/sessions`, collaborative session contribute.
 - **Auth**: signedFetch with Ed25519 (WebCrypto); ceremony-gated flows; file-based store (`.data/store.json`, `.data/collaborative-sessions.json`) for dev.
 
 ### Changed
