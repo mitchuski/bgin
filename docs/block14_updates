@@ -1,0 +1,93 @@
+# BGIN AI Block 14 Frontend Rebuild — Coding Agent Package
+
+## What This Is
+
+Documentation package for rebuilding the BGIN AI frontend aligned with the agentprivacy "Three Graphs, One Identity" architecture. Read ALL files before writing code.
+
+## Package Contents
+
+| File | Purpose |
+|---|---|
+| README.md | Overview and reading order |
+| 01_ARCHITECTURE.md | System architecture, data flow, component relationships |
+| 02_KEY_CEREMONY.md | Swordsman agent generation — onboarding flow |
+| 03_MAGE_AGENTS.md | Working Group Mage interfaces — RAG, chat, memory |
+| 04_PERSONAL_CURATION.md | Personal dashboard and meta-Mage layer |
+| 05_COLLABORATIVE_WORKSPACE.md | Promise graph interface, shared docs |
+| 06_TRUST_DISPLAY.md | Trust tier system and graph visualization |
+| 07_API_SPEC.md | All API endpoints, request/response schemas |
+| 08_DATA_MODELS.md | Database schemas, graph structures, storage |
+| 09_MIGRATION.md | Migration from existing bgin-homepage |
+| 10_DESIGN_SYSTEM.md | UI patterns, component library, visual language |
+| 11_BONFIRES_INTEGRATION.md | Bonfires.ai as alternative/complementary knowledge graph provider |
+| 12_SOULBAE_CASE_STUDY.md | Case study: deploying Soulbae through Bonfires — lessons for BGIN |
+| 13_MYTERMS_AGREEMENT_LAYER.md | IEEE 7012 bilateral agreements — the Swordsman's first blade |
+
+## Reading Order
+
+1. `01_ARCHITECTURE.md` — full system before touching components
+2. `09_MIGRATION.md` — what exists and what changes
+3. `08_DATA_MODELS.md` — data layer
+4. `07_API_SPEC.md` — API surface
+5. `13_MYTERMS_AGREEMENT_LAYER.md` — the agreement layer beneath all three graphs
+6. Component specs (02-06) as you build each feature
+7. `11_BONFIRES_INTEGRATION.md` — alternative knowledge graph architecture using Bonfires.ai
+8. `12_SOULBAE_CASE_STUDY.md` — case study informing the Bonfires integration decisions
+9. `10_DESIGN_SYSTEM.md` — reference throughout
+
+## Core Principles (DO NOT VIOLATE)
+
+1. **The gap between Swordsman and Mage is sacred** — no feature collapses it
+2. **Agreements before access** — no data exchange without bilateral MyTerms agreement
+3. **Promises, not impositions** — all commitments voluntary
+4. **Personal first, collaborative second** — value from Mages before workspace
+5. **Local-first data sovereignty** — participant device first, sync optional
+6. **Knowledge before trust** — learning comes first
+
+## Tech Stack
+
+- **Framework:** Next.js 14+ (TypeScript) — fork from bgin-homepage
+- **AI:** Claude API (Anthropic) for Mage conversational interfaces
+- **Vector DB:** Qdrant (self-hosted) or Pinecone
+- **Graph DB:** Neo4j for relationship traversal
+- **Key Management:** WebCrypto API
+- **Local Storage:** IndexedDB via Dexie.js
+- **Sync:** CRDTs (Yjs) for collaborative features
+- **Deployment:** Vercel
+- **Knowledge Graph (Option B):** Bonfires.ai — Delve intake, bounded agENTs, Knowledge Network
+  - See 11_BONFIRES_INTEGRATION.md for integration options
+  - Provides graph-level separation guarantees (validated via Soulbae deployment)
+  - Adds $KNOW token economy, stigmergic traces, Hyperblogs
+
+## Working Groups → Mages
+
+| Working Group | Mage | Domain |
+|---|---|---|
+| IKP | 🔐 IKP Mage | Privacy, identity, wallets, credentials, key management |
+| FASE | 💎 FASE Mage | DeFi, stablecoins, CBDCs, financial regulation |
+| Cybersecurity | 🛡️ Cyber Mage | Threat sharing, incident response, security standards |
+| Governance | 🏛️ Governance Mage | Bylaws, org structure, decision-making |
+
+## Three Graphs Model
+
+```
+KNOWLEDGE GRAPH (Substrate)
+    ↓ what you engage with
+PROMISE GRAPH (Overlay)
+    ↓ what you commit to
+TRUST GRAPH (Emergent)
+    ↓ what you've proven
+
+Unique intersection = participant identity
+```
+
+## The Duality
+
+- **Swordsman ⚔️** — Generated at key ceremony. Client-side. Guards privacy boundaries. Enforces Chatham House cryptographically.
+- **Mage 🧙** — One per working group, shared. Server-side RAG. Navigates collective knowledge. Never sees what Swordsman hides.
+
+The gap between them is where governance happens.
+
+---
+
+*⚔️ ⊥ 🧙 | 🏛️*

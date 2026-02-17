@@ -1,68 +1,36 @@
 {
-  "name": "bgin-ai-mvp",
-  "version": "1.0.0",
-  "description": "Multi-Agent Privacy-Preserving Research System for BGIN Governance",
-  "keywords": [
-    "blockchain",
-    "governance",
-    "privacy",
-    "ai-agents",
-    "decentralized-identity",
-    "trust-networks"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mitchuski/bgin-agents.git"
-  },
-  "license": "MIT",
-  "author": "Mitchuski <https://github.com/mitchuski>",
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
+  "name": "bginai-block14",
+  "version": "2.0.0",
+  "description": "BGIN AI Block 14 — Governance intelligence (Three Graphs, One Identity). Aligned with 00_IMPLEMENTATION_PLAN.",
+  "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
-    "dev:simple": "concurrently \"npm run dev:simple --workspace=backend\" \"npm run dev --workspace=frontend\"",
-    "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
-    "start": "npm run start --workspace=backend",
-    "test": "npm run test --workspace=backend && npm run test --workspace=frontend",
-    "lint": "npm run lint --workspace=backend && npm run lint --workspace=frontend",
-    "setup": "./scripts/setup-development.sh",
-    "docker:dev": "docker-compose up -d",
-    "docker:prod": "docker-compose -f docker-compose.production.yml up -d",
-    "db:migrate": "npm run db:migrate --workspace=backend",
-    "db:seed": "npm run db:seed --workspace=backend",
-    "agents:seed": "npm run agents:seed --workspace=backend",
-    "clean": "rm -rf node_modules frontend/node_modules backend/node_modules frontend/dist backend/dist"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.2.3",
-    "prettier": "^3.0.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{js,ts,tsx}": [
-      "prettier --write",
-      "git add"
-    ],
-    "*.{json,md}": [
-      "prettier --write",
-      "git add"
-    ]
-  },
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.65.0",
-    "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "dexie": "^4.0.0",
+    "next": "^14.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "uuid": "^9.0.0",
+    "yjs": "^13.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/uuid": "^9.0.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.2.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

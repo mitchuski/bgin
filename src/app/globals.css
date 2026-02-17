@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-tertiary: #1a1a28;
+  --border: #2a2a3a;
+  --text-primary: #e8e8f0;
+  --text-secondary: #8888a0;
+  --text-muted: #555570;
+  --wg-ikp: #7c6bff;
+  --wg-fase: #4ecdc4;
+  --wg-cyber: #ff6b6b;
+  --wg-governance: #ffd93d;
+  --tier-blade: #666680;
+  --tier-light: #7c6bff;
+  --tier-heavy: #4ecdc4;
+  --tier-dragon: #ffd93d;
+  --swordsman: #ff6b6b;
+  --mage: #7c6bff;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}

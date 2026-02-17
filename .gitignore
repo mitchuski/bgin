@@ -24,6 +24,9 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# Server store (dev; use PostgreSQL in production)
+.data/
+
 # Runtime data
 pids
 *.pid
@@ -133,7 +136,7 @@ dist-ssr
 
 # Chat storage (contains sensitive conversation data)
 chat-storage/
-*.json
+# Do not ignore package.json / package-lock.json (tracked)
 
 # API keys and secrets
 *.key
