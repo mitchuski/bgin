@@ -1,381 +1,130 @@
-# Contributing to BGIN AI MVP
+# Contributing to BGIN AI — Block 14
 
-We welcome contributions to the BGIN Multi-Agent Interface project! This project follows the principles outlined in the [BGIN Agentic Framework Archive Codex](https://sync.soulbis.com/s/bgin-agentic-framework-archive-codex) for sovereign, dignity-based AI development.
+We welcome contributions to the BGIN AI Block 14 project. This app implements governance intelligence for the BGIN constellation (Ceremony, Mages, Spellbook, Archive, Promises) and follows the principles in the [BGIN Agentic Framework Archive Codex](https://sync.soulbis.com/s/bgin-agentic-framework-archive-codex) and the **Block 14** spec in `block14_updates/`. All work should align with **`00_IMPLEMENTATION_PLAN.md`** (Phases 0–12).
 
-## 🌟 **How to Contribute**
+## How to Contribute
 
-### **1. Fork the Repository**
+### 1. Clone and branch
+
 ```bash
-git clone https://github.com/mitchuski/bgin-agents.git
-cd bgin-agents
-```
+git clone https://github.com/mitchuski/bgin.git
+cd bgin   # or your clone of BGINAI_Block14
 
-### **2. Create a Feature Branch**
-```bash
-git checkout -b feature/amazing-feature
+git checkout -b feature/short-description
 # or
 git checkout -b fix/bug-description
 ```
 
-### **3. Follow Development Guidelines**
+*(Remotes may also be named `bgin` or `origin` depending on your setup.)*
 
-#### **Code Standards**
-- **TypeScript**: Use TypeScript for type safety
-- **ESLint**: Follow ESLint configuration for code quality
-- **Prettier**: Use Prettier for code formatting
-- **Jest**: Write tests for new features
-- **Privacy-by-Design**: Implement privacy-preserving design patterns
+### 2. Follow development guidelines
 
-#### **Architecture Principles**
-- **Distributed Consciousness**: Multi-agent coordination with privacy preservation
-- **Privacy by Design**: Built-in privacy controls and data protection
-- **Dignity-based Economics**: Fair value distribution and user sovereignty
-- **Real-time Sovereignty Enforcement**: Continuous monitoring of privacy compliance
-- **Cryptoeconomic Verification**: Blockchain-based trust and verification systems
+#### Code standards
+- **TypeScript**: Use TypeScript; keep types accurate.
+- **ESLint**: Follow project ESLint config.
+- **Privacy-by-design**: No feature may collapse the Swordsman/Mage gap; agreements before access; promises, not impositions.
 
-### **4. Development Setup**
+#### Architecture principles (do not violate)
+- **Gap between Swordsman and Mage is sacred** — no feature collapses it.
+- **Agreements before access** — no data exchange without bilateral MyTerms.
+- **Promises, not impositions** — all commitments voluntary.
+- **Personal first, collaborative second** — value from Mages before workspace.
+- **Local-first data sovereignty** — participant device first, sync optional.
 
-#### **Prerequisites**
+### 3. Development setup
+
+#### Prerequisites
 - Node.js 18+
-- npm 9+
+- npm (or equivalent)
 - Git
-- Ollama (for local LLM testing)
 
-#### **Installation**
+#### Installation
+
 ```bash
-# Install dependencies
 npm install
-
-# Set up environment
-cp env.example .env
-# Edit .env with your configuration
-
-# Install and start Ollama
-ollama pull llama3.2:3b-instruct-q4_0
-
-# Start development servers
-npm run dev:simple  # Recommended for development
+cp .env.example .env
+# Set ANTHROPIC_API_KEY and/or NEAR_AI_API_KEY for Mage chat
 ```
 
-#### **Available Scripts**
-```bash
-# Development
-npm run dev              # Start both frontend and backend
-npm run dev:simple       # Start with simple backend (recommended)
-npm run build            # Build for production
-npm run start            # Start production server
-
-# Testing
-npm run test             # Run tests
-npm run test:coverage    # Run tests with coverage
-npm run lint             # Lint code
-npm run lint:fix         # Fix linting issues
-
-# Database
-npm run db:migrate       # Run database migrations
-npm run db:seed          # Seed database
-npm run agents:seed      # Seed agent data
-```
-
-### **5. Making Changes**
-
-#### **Frontend Changes**
-- **Location**: `frontend/src/`
-- **Components**: React components in `components/`
-- **Services**: API services in `services/`
-- **Types**: TypeScript types in `types/`
-- **Contexts**: React contexts in `contexts/`
-
-#### **Backend Changes**
-- **Location**: `backend/src/` or `simple-server.js`
-- **Agents**: Agent implementations in `agents/`
-- **Routes**: API routes in `routes/`
-- **Middleware**: Express middleware in `middleware/`
-- **Services**: Business logic in `services/`
-
-#### **Conference Integration**
-- **Sessions**: Update `CONFERENCE_SESSIONS` in `simple-server.js`
-- **Tracks**: Update `CONFERENCE_TRACKS` in `simple-server.js`
-- **Frontend**: Update conference browser in `BGINMultiAgentInterface.tsx`
-
-### **6. Testing Your Changes**
-
-#### **Local Testing**
-```bash
-# Start the development server
-npm run dev:simple
-
-# Test the frontend
-open http://localhost:4000
-
-# Test API endpoints
-curl http://localhost:4000/api/status
-curl http://localhost:4000/api/conference/sessions
-```
-
-#### **Test Coverage**
-- Write unit tests for new functions
-- Test API endpoints
-- Test frontend components
-- Test multi-agent interactions
-
-### **7. Commit Your Changes**
-
-#### **Commit Message Format**
-```
-type(scope): description
-
-[optional body]
-
-[optional footer]
-```
-
-#### **Types**
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
-
-#### **Examples**
-```bash
-git commit -m "feat(conference): add new Block 13 session"
-git commit -m "fix(ui): resolve Multi Agent Hub display issue"
-git commit -m "docs(readme): update installation instructions"
-```
-
-### **8. Push and Create Pull Request**
+#### Commands
 
 ```bash
-# Push your branch
-git push origin feature/amazing-feature
-
-# Create a Pull Request on GitHub
+npm run dev     # http://localhost:3000
+npm run build
+npm run start
+npm run lint    # if configured
 ```
 
-## 📋 **Pull Request Guidelines**
+### 4. Where to make changes
 
-### **Before Submitting**
-- [ ] Code follows TypeScript and ESLint standards
-- [ ] Tests pass and coverage is maintained
-- [ ] Documentation is updated if needed
-- [ ] Privacy-by-design principles are followed
-- [ ] Changes are compatible with existing architecture
+This repo is a **single Next.js 14+ App Router** application (no separate frontend/backend).
 
-### **Pull Request Template**
-```markdown
-## Description
-Brief description of changes
+| Area | Location | Notes |
+|------|----------|--------|
+| **Pages** | `src/app/` | `page.tsx` (Block 14 home), `ceremony/`, `mage/`, `mage/[wg]/`, `spellbook/`, `promises/`, `dashboard/`, etc. |
+| **API routes** | `src/app/api/` | `ceremony/register`, `mage/[wg]/chat`, `curation/feed`, `curation/briefing`, `spellbook/entries`, `spellbook/sessions`, `promises`, `sessions`, etc. |
+| **Components** | `src/components/` | `ceremony/`, `mage/`, `layout/` (Header, MagePanel), `dashboard/`, `workspace/`, `shared/`, `ui/` |
+| **Contexts** | `src/contexts/` | e.g. `MagePanelContext.tsx` (side panel state) |
+| **Lib** | `src/lib/` | `ceremony/`, `storage/`, `mage/`, `auth/`, `swordsman/`, `bgin/` (documents), `block14/` (sessions) |
+| **Block 14 timetable** | `src/lib/block14/sessions.ts` | Single source for March 1–2, 2026 sessions |
+| **Spells / BGIN docs** | `src/lib/bgin/documents.ts` | BGIN publications and projects for curation feed |
 
-## Type of Change
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Breaking change
-- [ ] Documentation update
+#### Aligning with the plan
+- Read **`00_IMPLEMENTATION_PLAN.md`** (in `block14_updates/`) for phases and priorities.
+- **01_ARCHITECTURE.md**, **07_API_SPEC.md**, **08_DATA_MODELS.md** define system and APIs.
+- **docs/PROJECT_STATUS.md** — API ↔ UI map and where the interface can break.
 
-## Testing
-- [ ] Unit tests pass
-- [ ] Integration tests pass
-- [ ] Manual testing completed
+### 5. Testing your changes
 
-## Privacy & Security
-- [ ] Privacy-by-design principles followed
-- [ ] No sensitive data exposed
-- [ ] Security best practices maintained
+- Run **Ceremony** end-to-end; confirm `.data/store.json` has your participant.
+- **Mage**: Open side panel (🧙), pick a WG, send a message (requires `ANTHROPIC_API_KEY` or `NEAR_AI_API_KEY`).
+- **Spellbook**: Cast from Mage to a session or WG spellbook; check Spellbook page.
+- **Promises**: Create/move a promise on `/promises`.
+- See **docs/DEMO_FLOW.md** for a full demo path.
 
-## Related Issues
-Closes #(issue number)
+### 6. Commit and pull request
+
+#### Commit format (conventional)
+```
+type(scope): short description
+```
+- **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- **Examples**: `feat(spellbook): add cast to session`, `docs(readme): update status`, `fix(ceremony): redirect when no keys`
+
+#### Before submitting a PR
+- [ ] Code aligns with `00_IMPLEMENTATION_PLAN.md` and core principles
+- [ ] No collapse of Swordsman/Mage gap; agreements before access
+- [ ] Docs/README updated if you changed surface or flow
+- [ ] Manual check of affected flow (ceremony, Mage, Spellbook, promises, or Archive)
+
+## Project structure (current)
+
+```
+BGINAI_Block14/
+├── src/
+│   ├── app/              # Next.js App Router (pages + api)
+│   ├── components/       # ceremony, mage, layout, dashboard, workspace, shared, ui
+│   ├── contexts/         # MagePanelContext, etc.
+│   └── lib/              # ceremony, storage, mage, auth, swordsman, bgin, block14
+├── docs/                 # PROJECT_STATUS.md, DEMO_FLOW.md, README pointer
+├── block14_updates/      # Spec (sibling or local): 00_IMPLEMENTATION_PLAN, 01–13
+├── README.md
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── SECURITY.md
+└── package.json
 ```
 
-## 🏗️ **Project Structure**
+## Resources
 
-```
-bgin-ai-mvp/
-├── frontend/                 # React frontend
-│   ├── src/
-│   │   ├── components/       # React components
-│   │   │   ├── BGINMultiAgentInterface.tsx
-│   │   │   ├── agents/       # Agent-specific components
-│   │   │   ├── privacy/      # Privacy components
-│   │   │   └── trust/        # Trust network components
-│   │   ├── contexts/         # React contexts
-│   │   ├── hooks/            # Custom hooks
-│   │   ├── services/         # API services
-│   │   └── types/            # TypeScript types
-│   └── package.json
-├── backend/                  # Node.js backend
-│   ├── src/
-│   │   ├── agents/           # Agent implementations
-│   │   │   ├── archive/      # Archive Agent
-│   │   │   ├── codex/        # Codex Agent
-│   │   │   └── discourse/    # Discourse Agent
-│   │   ├── routes/           # API routes
-│   │   ├── middleware/       # Express middleware
-│   │   ├── services/         # Business logic
-│   │   ├── privacy/          # Privacy-preserving systems
-│   │   ├── trust/            # Trust network systems
-│   │   └── utils/            # Utilities
-│   └── package.json
-├── simple-server.js          # Simple development server
-├── database/                 # Database schemas
-├── docs/                     # Documentation
-├── scripts/                  # Setup scripts
-└── infrastructure/           # Deployment configurations
-```
-
-## 🔒 **Privacy & Security Guidelines**
-
-### **Privacy-by-Design**
-- Implement privacy controls at the design stage
-- Minimize data collection and processing
-- Use encryption for sensitive data
-- Implement data retention policies
-- Provide user control over data
-
-### **Security Best Practices**
-- Validate all inputs
-- Use secure authentication methods
-- Implement proper error handling
-- Follow OWASP guidelines
-- Regular security audits
-
-### **Data Protection**
-- No hardcoded secrets or API keys
-- Use environment variables for configuration
-- Implement proper logging without exposing sensitive data
-- Follow GDPR and privacy regulations
-
-## 🌐 **Integration Guidelines**
-
-### **Conference Integration**
-- Follow Block 13 session structure
-- Maintain track-based organization
-- Implement proper session metadata
-- Support Multi Agent Hub functionality
-
-### **Agent Development**
-- Follow the three-agent architecture (Archive, Codex, Discourse)
-- Implement proper agent-specific functionality
-- Maintain privacy and security standards
-- Support multi-agent collaboration
-
-### **API Development**
-- Follow RESTful API principles
-- Implement proper error handling
-- Use consistent response formats
-- Document all endpoints
-
-## 🐛 **Bug Reports**
-
-### **Before Reporting**
-1. Check existing issues
-2. Test with latest version
-3. Verify the bug is reproducible
-4. Gather relevant information
-
-### **Bug Report Template**
-```markdown
-## Bug Description
-Clear description of the bug
-
-## Steps to Reproduce
-1. Step one
-2. Step two
-3. Step three
-
-## Expected Behavior
-What should happen
-
-## Actual Behavior
-What actually happens
-
-## Environment
-- OS: [e.g., Windows 10]
-- Node.js version: [e.g., 18.17.0]
-- Browser: [e.g., Chrome 91]
-
-## Additional Context
-Any other relevant information
-```
-
-## 💡 **Feature Requests**
-
-### **Before Requesting**
-1. Check existing features
-2. Consider if it aligns with project goals
-3. Think about implementation complexity
-4. Consider privacy and security implications
-
-### **Feature Request Template**
-```markdown
-## Feature Description
-Clear description of the feature
-
-## Use Case
-Why is this feature needed?
-
-## Proposed Solution
-How should this feature work?
-
-## Alternatives Considered
-What other options were considered?
-
-## Additional Context
-Any other relevant information
-```
-
-## 📚 **Documentation**
-
-### **Code Documentation**
-- Use JSDoc for functions and classes
-- Document complex algorithms
-- Explain privacy and security considerations
-- Include usage examples
-
-### **API Documentation**
-- Document all endpoints
-- Include request/response examples
-- Explain authentication requirements
-- Document error codes
-
-### **User Documentation**
-- Keep README up to date
-- Document installation and setup
-- Provide usage examples
-- Include troubleshooting guides
-
-## 🤝 **Community Guidelines**
-
-### **Code of Conduct**
-- Be respectful and inclusive
-- Focus on constructive feedback
-- Help others learn and grow
-- Follow the BGIN community values
-
-### **Communication**
-- Use clear and concise language
-- Provide context for suggestions
-- Be open to feedback
-- Ask questions when needed
-
-## 📞 **Getting Help**
-
-### **Resources**
+- **README.md** — Project overview, what’s implemented, phases, tech stack.
+- **docs/PROJECT_STATUS.md** — What’s connected, API ↔ UI, where it can break.
+- **docs/DEMO_FLOW.md** — Demo order and quick path.
+- **BLOCK_14_ALIGNMENT_COMPARISON.md** — Alignment with Block 14 / agentprivacy.
+- **BLOCK13_KNOWLEDGE_ARCHIVES.md** — Knowledge base context for Block 14.
 - [BGIN Community](https://bgin.discourse.group/)
 - [BGIN Agentic Framework Archive Codex](https://sync.soulbis.com/s/bgin-agentic-framework-archive-codex)
-- [Project Documentation](./docs/)
-- [GitHub Issues](https://github.com/mitchuski/bgin-agents/issues)
-
-### **Contact**
-- Create an issue for questions
-- Join the BGIN community discussions
-- Check the documentation first
-- Reference the framework codex for architectural guidance
 
 ---
 
-**Thank you for contributing to the BGIN AI MVP project!**
-
-*Together, we're building a sovereign, dignity-based, privacy-preserving AI agent ecosystem for blockchain governance research and collaboration.*
+Thank you for contributing. The plan is the promise; the execution is the proof. ⚔️ ⊥ 🧙 | 🏛️

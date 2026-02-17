@@ -1,243 +1,85 @@
-# Security Policy
+# Security Policy — BGIN AI Block 14
 
-## 🔒 **Security Overview**
+## Security overview
 
-The BGIN AI MVP project is designed with privacy-by-design principles and implements comprehensive security measures to protect user data and ensure system integrity. This document outlines our security policies, procedures, and guidelines.
+The BGIN AI Block 14 project is designed with privacy-by-design and sovereign identity in mind. This document outlines security-relevant behavior, how to report vulnerabilities, and configuration guidance for the **current** stack (Next.js, WebCrypto/Ed25519, ceremony, Mage, Spellbook, Archive, Promises). It should be read together with **README.md** and **docs/PROJECT_STATUS.md**.
 
-## 🛡️ **Supported Versions**
+## Supported versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | ✅ Yes             |
-| 0.9.x   | ✅ Yes             |
-| 0.8.x   | ❌ No              |
-| < 0.8   | ❌ No              |
+| Focus              | Supported |
+|--------------------|-----------|
+| Current `master`   | ✅ Yes    |
+| Block 14 spec (00) | ✅ Aligned |
+| Older Block 13 MVP | ❌ Not maintained in this repo |
 
-## 🚨 **Reporting a Vulnerability**
+## Reporting a vulnerability
 
-### **How to Report**
-If you discover a security vulnerability, please report it responsibly:
+**Do not** report security issues in public issues.
 
-1. **DO NOT** create a public GitHub issue
-2. **DO NOT** disclose the vulnerability publicly
-3. **DO** report it privately using one of these methods:
+1. **Preferred**: [GitHub Security Advisories](https://github.com/mitchuski/bgin/security/advisories) for this repository (or the repo you forked from).
+2. **Alternative**: Email [security@bgin-global.org](mailto:security@bgin-global.org) with subject **"Security Vulnerability — BGIN AI Block 14"**.
 
-#### **Option 1: GitHub Security Advisory**
-- Go to [Security Advisories](https://github.com/mitchuski/bgin-agents/security/advisories)
-- Click "Report a vulnerability"
-- Fill out the security advisory form
+Include: description, steps to reproduce, impact, and suggested fix if any.
 
-#### **Option 2: Direct Contact**
-- Email: [security@bgin-global.org](mailto:security@bgin-global.org)
-- Subject: "Security Vulnerability Report - BGIN AI MVP"
-- Include detailed information about the vulnerability
+- **Initial response**: Within 48 hours  
+- **Status update**: Within 7 days  
+- **Resolution**: Depends on severity; target within 30 days for critical issues  
 
-### **What to Include**
-- Description of the vulnerability
-- Steps to reproduce
-- Potential impact
-- Suggested fix (if any)
-- Your contact information
+## Security-relevant behavior (current app)
 
-### **Response Timeline**
-- **Initial Response**: Within 48 hours
-- **Status Update**: Within 7 days
-- **Resolution**: Within 30 days (depending on severity)
+### Authentication and identity
+- **Ceremony**: 8-step key ceremony produces Ed25519 keypair; keys and agent card stored in **IndexedDB** (Dexie) on the client. Participant is registered with the server via `POST /api/ceremony/register` (agent card in body).
+- **Signed requests**: Authenticated calls use **signedFetch** (signature over `participantId:timestamp:body` with client’s private key). Server verifies using stored public key. No JWT; no session cookies for API auth.
+- **Gating**: Dashboard, Mage chat, Spellbook, Promises, and related APIs expect a completed ceremony; missing identity redirects to Ceremony or returns 401.
 
-## 🔐 **Security Features**
+### Data protection
+- **Secrets**: No secrets in repo. Use **environment variables** (e.g. `ANTHROPIC_API_KEY`, `NEAR_AI_API_KEY`) in `.env`; never commit `.env`.
+- **Server state (dev)**: File-based (`.data/store.json`, `.data/collaborative-sessions.json`). Treat as sensitive; ensure read/write permissions and backup handling are safe. Production will use proper DB per **08_DATA_MODELS.md**.
+- **Transport**: Use HTTPS in production; API is same-origin in dev.
 
-### **Authentication & Authorization**
-- **JWT Tokens**: Secure token-based authentication
-- **DID-based Identity**: Decentralized identifier management
-- **Role-based Access**: Granular permission system
-- **Session Management**: Secure session handling
+### AI and privacy
+- **Mage**: Chat is sent to Anthropic or NEAR Cloud AI per config. No feature should collapse the **Swordsman/Mage gap** (knowledge vs. action). Privacy budget and RAG behavior are per spec (e.g. **03_MAGE_AGENTS.md** in `block14_updates/`).
 
-### **Data Protection**
-- **Encryption at Rest**: Sensitive data encrypted in storage
-- **Encryption in Transit**: HTTPS/TLS for all communications
-- **Input Validation**: Comprehensive input sanitization
-- **Output Encoding**: Protection against injection attacks
+### Network and API
+- **CORS**: Configure appropriately for your deployment.
+- **Input validation**: Validate and sanitize all API inputs; avoid leaking stack traces or internals in error responses.
+- **Rate limiting**: Consider adding for public or high-traffic deployments.
 
-### **Privacy Controls**
-- **Privacy Levels**: Configurable privacy settings (Maximum/High/Selective/Minimal)
-- **Data Minimization**: Collect only necessary data
-- **User Control**: Users control their data and privacy settings
-- **Audit Logging**: Comprehensive activity tracking with privacy preservation
+## Configuration (environment)
 
-### **Network Security**
-- **CORS Protection**: Cross-origin resource sharing controls
-- **Rate Limiting**: Protection against abuse and DoS attacks
-- **Helmet Security**: Security headers and protections
-- **Request Validation**: Comprehensive request validation
-
-## 🏗️ **Security Architecture**
-
-### **Multi-Agent System Security**
-- **Agent Isolation**: Each agent operates in isolated environment
-- **Inter-agent Communication**: Secure communication channels
-- **Trust Networks**: Reputation-based trust system
-- **Privacy-Preserving Analytics**: Zero-knowledge proof integration
-
-### **Conference Session Security**
-- **Session Isolation**: Each conference session has isolated data
-- **Project Containers**: Secure project data separation
-- **Multi Agent Hub**: Secure collaborative environment
-- **Track-based Access**: Role-based access to different tracks
-
-### **LLM Integration Security**
-- **Local Processing**: Ollama local LLM for sensitive data
-- **Confidential Compute**: Phala Cloud TEE for cloud processing
-- **Data Sovereignty**: User-controlled data processing
-- **Privacy-Preserving AI**: Zero-knowledge AI processing
-
-## 🔍 **Security Best Practices**
-
-### **For Developers**
-- **Code Review**: All code changes require security review
-- **Dependency Scanning**: Regular dependency vulnerability scanning
-- **Static Analysis**: Automated security code analysis
-- **Secure Coding**: Follow secure coding practices
-
-### **For Users**
-- **Environment Variables**: Never commit secrets to version control
-- **Regular Updates**: Keep dependencies and system updated
-- **Access Control**: Use strong authentication and authorization
-- **Data Handling**: Follow data protection guidelines
-
-### **For Administrators**
-- **Monitoring**: Continuous security monitoring
-- **Incident Response**: Clear incident response procedures
-- **Backup Security**: Secure backup and recovery procedures
-- **Access Management**: Regular access review and cleanup
-
-## 🚨 **Security Incident Response**
-
-### **Incident Classification**
-- **Critical**: System compromise, data breach
-- **High**: Significant security vulnerability
-- **Medium**: Moderate security issue
-- **Low**: Minor security concern
-
-### **Response Procedures**
-1. **Detection**: Identify and assess the incident
-2. **Containment**: Isolate affected systems
-3. **Investigation**: Analyze the incident
-4. **Recovery**: Restore normal operations
-5. **Post-incident**: Review and improve security
-
-### **Communication**
-- **Internal**: Notify development team immediately
-- **Users**: Notify affected users if necessary
-- **Public**: Coordinate public communication if required
-- **Regulatory**: Comply with applicable regulations
-
-## 🔧 **Security Configuration**
-
-### **Environment Variables**
 ```bash
-# Security Configuration
-NODE_ENV=production
-JWT_SECRET=your-secure-jwt-secret
-ENCRYPTION_KEY=your-encryption-key
-SESSION_SECRET=your-session-secret
+# Required for Mage chat (at least one)
+ANTHROPIC_API_KEY=...   # Claude
+NEAR_AI_API_KEY=...     # NEAR Cloud AI (e.g. TEE)
 
-# Privacy Settings
-PRIVACY_LEVEL=maximum
-DATA_RETENTION_DAYS=30
-AUDIT_LOGGING=enabled
-
-# Network Security
-CORS_ORIGIN=https://yourdomain.com
-RATE_LIMIT_WINDOW=15
-RATE_LIMIT_MAX=100
+# Environment
+NODE_ENV=production     # in production
 ```
 
-### **Database Security**
-- **Connection Encryption**: Use SSL/TLS for database connections
-- **Access Control**: Implement proper database access controls
-- **Backup Encryption**: Encrypt database backups
-- **Audit Logging**: Log all database access
+Do **not** commit these. Use `.env.example` (without real keys) to document required variables.
 
-### **API Security**
-- **Authentication**: Require authentication for all API endpoints
-- **Rate Limiting**: Implement rate limiting on all endpoints
-- **Input Validation**: Validate all input parameters
-- **Output Sanitization**: Sanitize all output data
+## Security checklist (deployment)
 
-## 📋 **Security Checklist**
+- [ ] No secrets or API keys in repo or client bundle
+- [ ] HTTPS in production
+- [ ] Ceremony and signed request flow tested
+- [ ] `.data/` (or production DB) access restricted and backed up securely
+- [ ] Dependencies reviewed and updated; run `npm audit` (or equivalent)
+- [ ] Error responses do not expose internal paths or stack traces to clients
 
-### **Before Deployment**
-- [ ] All dependencies updated and scanned
-- [ ] Security headers configured
-- [ ] Authentication and authorization tested
-- [ ] Input validation implemented
-- [ ] Error handling secure
-- [ ] Logging configured (no sensitive data)
-- [ ] HTTPS enabled
-- [ ] CORS properly configured
-- [ ] Rate limiting enabled
-- [ ] Database security configured
+## References
 
-### **Regular Security Tasks**
-- [ ] Dependency vulnerability scanning
-- [ ] Security code review
-- [ ] Penetration testing
-- [ ] Access review
-- [ ] Backup verification
-- [ ] Incident response testing
-- [ ] Security training updates
-- [ ] Policy review
-
-## 🔗 **Security Resources**
-
-### **External Resources**
-- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-- [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
-- [CIS Controls](https://www.cisecurity.org/controls/)
-- [GDPR Compliance](https://gdpr.eu/)
-
-### **Internal Resources**
-- [BGIN Security Guidelines](https://bgin-global.org/security)
-- [Privacy by Design Principles](https://bgin-global.org/privacy)
-- [Trust over IP Security](https://trustoverip.org/security)
-
-## 📞 **Security Contact**
-
-### **Primary Contact**
-- **Email**: [security@bgin-global.org](mailto:security@bgin-global.org)
-- **GitHub**: [Security Advisories](https://github.com/mitchuski/bgin-agents/security/advisories)
-
-### **Emergency Contact**
-- **Phone**: +1-XXX-XXX-XXXX (for critical security incidents)
-- **Response Time**: Within 4 hours for critical issues
-
-## 📄 **Legal and Compliance**
-
-### **Data Protection**
-- **GDPR**: European General Data Protection Regulation compliance
-- **CCPA**: California Consumer Privacy Act compliance
-- **PIPEDA**: Personal Information Protection and Electronic Documents Act compliance
-
-### **Privacy Rights**
-- **Right to Access**: Users can request their data
-- **Right to Rectification**: Users can correct their data
-- **Right to Erasure**: Users can delete their data
-- **Right to Portability**: Users can export their data
-
-### **Audit and Compliance**
-- **Regular Audits**: Annual security audits
-- **Compliance Monitoring**: Continuous compliance monitoring
-- **Documentation**: Comprehensive security documentation
-- **Training**: Regular security training for team members
+- **README.md** — Tech stack, principles, project structure  
+- **docs/PROJECT_STATUS.md** — API ↔ UI map, where things can break  
+- **block14_updates/01_ARCHITECTURE.md** — System and Swordsman/Mage separation  
+- **block14_updates/03_MAGE_AGENTS.md** — Mage privacy and behavior  
 
 ---
 
-**Last Updated**: October 7, 2025
-
-**Version**: 1.0.0
-
-**Next Review**: April 7, 2026
+**Last updated**: February 2026  
+**App**: BGIN AI Block 14 (implementation flow mid–working)  
+**Next review**: As needed for production rollout (Phases 11–12)
 
 ---
 
-*This security policy is part of our commitment to maintaining the highest standards of security and privacy in the BGIN AI MVP project. We continuously work to improve our security posture and welcome feedback from the community.*
+*This policy reflects the current Block 14 implementation. For broader BGIN security and privacy principles, see [bgin-global.org](https://bgin-global.org) and the BGIN Agentic Framework Archive Codex.*

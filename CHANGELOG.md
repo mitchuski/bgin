@@ -1,9 +1,47 @@
 # Changelog
 
-All notable changes to the BGIN AI MVP project will be documented in this file.
+All notable changes to the BGIN AI Block 14 project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased] — Block 14 (2025–2026)
+
+### Summary
+
+Implementation flow **mid–working**: Block 14 homepage, Ceremony, Mage (side panel + WG chat), Spellbook (sessions, by-WG, recent casts), Archive (Spells, briefings, Knowledge map), and Promises are in place. Trust graph, full MyTerms wiring, and RAG/ingestion are in progress or stubbed.
+
+### Added
+
+- **Block 14 homepage**: Timetable (March 1–2, 2026), Get started, promise feed, cast feed; links to Spellbook by session.
+- **Ceremony**: 8-step key ceremony (keygen, privacy, MyTerms, WG selection, agent card); keys and identity in IndexedDB; `POST /api/ceremony/register`.
+- **Archive** (`/mage`): Talk to a Mage by WG (IKP, FASE, Cyber, Governance), Block 14 briefings, Knowledge map, **Spells** (BGIN publications/projects from bgin-global.org/projects, newest first).
+- **Spellbook** (`/spellbook`): Promises strip; Cast to session (timetable); Spellbook by working group; Recent casts; all expandable. Single timetable source in `src/lib/block14/sessions.ts`.
+- **Mage**: Side panel (🧙 in header) with WG selector and MageChat; one cast per response (to session or to WG spellbook). Full-page Mage at `/mage/[wg]`.
+- **Promises** (`/promises`): Single page for all WGs; promise board and assessment flows; signed API.
+- **APIs**: `/api/ceremony/register`, `/api/mage/[wg]/chat`, `/api/curation/feed`, `/api/curation/briefing`, `/api/spellbook/entries`, `/api/spellbook/sessions`, `/api/promises`, `/api/sessions`, collaborative session contribute.
+- **Auth**: signedFetch with Ed25519 (WebCrypto); ceremony-gated flows; file-based store (`.data/store.json`, `.data/collaborative-sessions.json`) for dev.
+
+### Changed
+
+- **Stack**: Next.js 14+ App Router (single app), TypeScript; no separate frontend/backend repos in this folder.
+- **AI**: Mage uses Anthropic (Claude) or NEAR Cloud AI; `ANTHROPIC_API_KEY` or `NEAR_AI_API_KEY` in `.env`.
+- **Structure**: `src/app`, `src/lib`, `src/components`, `src/contexts` (e.g. MagePanelContext); docs in `docs/`, spec in `block14_updates/`.
+- **README**: Reworked for whole project and mid-implementation state; points to PROJECT_STATUS, DEMO_FLOW, BLOCK_14_ALIGNMENT_COMPARISON.
+
+### In progress / stubbed
+
+- Knowledge graph and RAG pipeline (Phase 4); ingestion scripts.
+- Trust display (Phase 8); API stubs.
+- Full MyTerms negotiate wiring; codex/drafts in workspace.
+- Design system polish (Phase 9–10).
+
+### References
+
+- Master plan: `00_IMPLEMENTATION_PLAN.md` (in `block14_updates/`).
+- Status: `docs/PROJECT_STATUS.md`, `docs/DEMO_FLOW.md`, `BLOCK_14_ALIGNMENT_COMPARISON.md`.
+
+---
 
 ## [1.0.0] - 2025-10-07
 

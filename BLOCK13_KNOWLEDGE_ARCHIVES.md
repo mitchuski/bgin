@@ -1,194 +1,86 @@
-# Block 13 Conference Knowledge Archives
+# Block 13 → Block 14 Knowledge Archives
 
 ## Overview
 
-The knowledge archives have been updated to better reflect the actual Block 13 Conference work items and tracks. This document outlines the comprehensive set of example documents and knowledge base content that now accurately represents the conference's focus areas.
+This document describes the knowledge-archive context used for ingestion and RAG in the BGIN AI app. The app has evolved from **Block 13** conference sessions and tracks to **Block 14** (March 1–2, 2026): timetable-driven sessions, Mage chat by working group, Spellbook (casts by session and by WG), and the **Spells** feed (BGIN publications and projects). The knowledge base supports the same working groups and is aligned with the current implementation.
 
-## Conference Tracks and Sessions
+## Working Groups (Block 13 & Block 14)
 
-### 1. BGIN Agent Hack Track
-- **Focus**: Multi-agent system development and AI governance research
-- **Sessions**: 
-  - BGIN Agent Hack (Day 1 & 2)
-  - AI Agent Governance
-- **Key Documents**:
-  - Multi-Agent System Architecture for Blockchain Governance
-  - AI Agent Governance Framework for Blockchain Systems
+### 1. Identity, Key Management & Privacy (IKP)
+- **Focus**: Cryptographic identity, key management, privacy-preserving tech
+- **Sessions (Block 13)**: Offline Key Management, ZKP and Privacy Enhanced Authentication, Crypto Agility and PQC Migration
+- **Key Documents**: Offline Key Management Best Practices, Zero-Knowledge Proof Authentication Framework, privacy-preserving systems
 
-### 2. Identity, Key Management & Privacy (IKP) Track
-- **Focus**: Cryptographic identity, key management, and privacy-preserving technologies
-- **Sessions**:
-  - Offline Key Management
-  - ZKP and Privacy Enhanced Authentication
-  - Crypto Agility and PQC Migration
-- **Key Documents**:
-  - Offline Key Management Best Practices for Blockchain Systems
-  - Zero-Knowledge Proof Authentication Framework for Privacy-Preserving Systems
+### 2. FASE (Financial and Social Economies)
+- **Focus**: Policy and financial applications of blockchain
+- **Sessions (Block 13)**: Information Sharing Framework Standard, Practical Stablecoin Implementation, Harmonization (Crypto-asset, Stablecoin, Tokenized Deposit)
+- **Key Documents**: Information Sharing Framework Standard, Practical Stablecoin Implementation Guide
 
-### 3. Cyber Security Track
-- **Focus**: Blockchain security, threat analysis, and protection mechanisms
-- **Sessions**:
-  - Governance of Security Supply Chain
-  - Security Target and Protection Profile
-  - Forensics & Analysis
-  - Common Lexicon for Harmful On-Chain Activities
-- **Key Documents**:
-  - Governance Framework for Blockchain Security Supply Chains
-  - Security Targets and Protection Profiles for Blockchain Systems
+### 3. Cyber Security
+- **Focus**: Blockchain security, threat analysis, supply chain
+- **Sessions (Block 13)**: Governance of Security Supply Chain, Security Target and Protection Profile, Forensics & Analysis, Common Lexicon for Harmful On-Chain Activities
+- **Key Documents**: Governance Framework for Blockchain Security Supply Chains, Security Targets and Protection Profiles
 
-### 4. FASE (Financial and Social Economies) Track
-- **Focus**: Policy and financial applications of blockchain technology
-- **Sessions**:
-  - Information Sharing Framework Standard
-  - Practical Stablecoin Implementation Guide
-  - Harmonization among Crypto-asset, Stablecoin and Tokenized Deposit
-- **Key Documents**:
-  - Information Sharing Framework Standard for Blockchain Ecosystems
-  - Practical Stablecoin Implementation Guide
+### 4. Governance (General)
+- **Focus**: Cross-cutting governance, metrics, accountability
+- **Sessions (Block 13)**: Technical Metrics to Evaluate Decentralization, Accountable Wallet, Security Gathering
+- **Key Documents**: Technical Metrics for Decentralization, governance frameworks
 
-### 5. General Track
-- **Focus**: Cross-cutting topics and general discussions
-- **Sessions**:
-  - Technical Metrics to Evaluate Decentralization
-  - Accountable Wallet
-  - Security Gathering on the Hill
-- **Key Documents**:
-  - Technical Metrics to Evaluate Decentralization in Blockchain Networks
+### 5. BGIN Agent / Hack (Block 13)
+- **Focus**: Multi-agent systems, AI governance research
+- **Key Documents**: Multi-Agent System Architecture, AI Agent Governance Framework
 
-## Document Categories
+## How the Current App Uses Knowledge
 
-### Technical Specifications
-- Multi-Agent System Architecture
-- Zero-Knowledge Proof Authentication Framework
-- Security Targets and Protection Profiles
+### Archive & Spells
+- **Archive** (`/mage`): Talk to a Mage (by WG), Block 14 briefings, Knowledge map.
+- **Spells**: BGIN publications and projects from [bgin-global.org/projects](https://bgin-global.org/projects), served by `GET /api/curation/feed`, sorted by date (newest first). Implemented in `src/lib/bgin/documents.ts` and `src/app/api/curation/feed/route.ts`.
 
-### Implementation Guides
-- Offline Key Management Best Practices
-- Practical Stablecoin Implementation Guide
-- Technical Metrics for Decentralization
+### Mage Chat & RAG
+- **Mage** (side panel or `/mage/[wg]`): WG-specific chat; `POST /api/mage/[wg]/chat`. RAG and document ingestion are **mid–working** (see Phase 4 in README and `00_IMPLEMENTATION_PLAN.md`).
 
-### Governance Frameworks
-- AI Agent Governance Framework
-- Blockchain Security Supply Chain Governance
-- Information Sharing Framework Standard
+### Spellbook & Casts
+- **Spellbook** (`/spellbook`): Sessions (Block 14 timetable), spellbooks by WG, recent casts. Casts are stored via spellbook entries API; session list from `src/lib/block14/sessions.ts`.
 
-### Policy Documents
-- Regulatory compliance guidelines
-- Security standards and certification
-- Privacy and data protection frameworks
+## Document Metadata (for ingestion)
 
-## Knowledge Base Features
+When ingesting or tagging documents, the system can use:
+- **Working group**: IKP, FASE, Cyber, Governance
+- **Tags**: Keywords for search and filtering
+- **Privacy level**: Maximum, High, Selective, Minimal (per spec)
+- **Source**: e.g. bgin-global.org/projects, conference briefings
 
-### Document Metadata
-Each document includes comprehensive metadata:
-- **Author**: Working group or team responsible
-- **Tags**: Relevant keywords for search and categorization
-- **Version**: Document version control
-- **Created Date**: Publication date
-- **Quality Score**: Document quality assessment (0.0-1.0)
-- **Privacy Level**: Maximum, High, Selective, or Minimal
+## Integration Points (current and planned)
 
-### Cross-References and Correlations
-Documents are linked through knowledge correlations:
-- **Technical Implementation**: Links between related technical documents
-- **Privacy Integration**: Connections between privacy-focused documents
-- **Governance Standards**: Links between governance frameworks
-- **Security Integration**: Connections between security-related documents
+### Current
+- **Spells feed**: BGIN projects/documents; curation feed API.
+- **Block 14 timetable**: Single source in `src/lib/block14/sessions.ts` (March 1–2, 2026).
+- **Ceremony**: Participant identity and working-group selection; keys in IndexedDB.
 
-### Search and Discovery
-The knowledge base supports:
-- **Semantic Search**: AI-powered content understanding
-- **Tag-based Filtering**: Filter by working group, topic, or document type
-- **Cross-session Search**: Find related content across different tracks
-- **Privacy-preserving Search**: Search without exposing sensitive content
+### Planned / mid–working
+- **Document ingestion pipeline**: Scripts and RAG pipeline per Phase 4; see `00_IMPLEMENTATION_PLAN.md` and `08_DATA_MODELS.md`.
+- **Vector/graph**: Qdrant, Neo4j per plan; knowledge graph and episodic memory in progress.
+- **Full MyTerms**: Agreement layer and API wiring (stubs exist).
 
-## Working Groups and Agents
+## Usage for developers
 
-### Archive Agents
-- **Purpose**: Knowledge synthesis and document analysis
-- **Capabilities**: Cross-session search, privacy-preserving knowledge management
-- **Privacy Level**: Maximum (TEE-verified processing)
+### Loading / seeding data
+- **Spells**: Fetched or derived from BGIN projects; see `src/lib/bgin/documents.ts`.
+- **Sessions**: Edit `src/lib/block14/sessions.ts` for Block 14 timetable.
+- **Ingestion**: When implemented, follow `00_IMPLEMENTATION_PLAN.md` Phase 4 and any `scripts/` ingest steps; DB and env per `08_DATA_MODELS.md`.
 
-### Codex Agents
-- **Purpose**: Policy analysis and standards development
-- **Capabilities**: Compliance checking, regulatory framework analysis
-- **Privacy Level**: High (encrypted processing)
+### Querying (current APIs)
+- **Curation feed**: `GET /api/curation/feed?workingGroups=...&limit=...&offset=...` (auth via signedFetch after ceremony).
+- **Briefing**: `GET /api/curation/briefing?meetingId=...`
+- **Mage chat**: `POST /api/mage/[wg]/chat` (body and auth per `07_API_SPEC.md`).
 
-### Discourse Agents
-- **Purpose**: Communications and collaboration
-- **Capabilities**: Community engagement, consensus building
-- **Privacy Level**: Selective (community-visible)
+## References
 
-## Integration Points
+- **README.md** — Project overview, phases, and current status.
+- **docs/PROJECT_STATUS.md** — API ↔ UI map and where things can break.
+- **BLOCK_14_ALIGNMENT_COMPARISON.md** — Alignment with Block 14 / agentprivacy architecture.
+- **block14_updates/** — Full spec (00_IMPLEMENTATION_PLAN, 01_ARCHITECTURE, 07_API_SPEC, 08_DATA_MODELS, etc.).
 
-### Kwaai Privacy Platform
-- Privacy-preserving analytics
-- Selective disclosure protocols
-- Zero-knowledge proof integration
+---
 
-### First Person Project (FPP)
-- Data sovereignty controls
-- Dignity-based economics
-- User-controlled data sharing
-
-### BGIN Discourse Integration
-- Community forum connectivity
-- Consensus building tools
-- Knowledge sharing protocols
-
-## Usage Instructions
-
-### Loading the Data
-1. **Database Setup**: Ensure PostgreSQL is running with the BGIN AI MVP database
-2. **Environment Configuration**: Set up `.env` file with database credentials
-3. **Run Loader Script**: Execute `node scripts/load-block13-data.js`
-
-### Querying the Knowledge Base
-1. **Archive Agent**: Use `/api/agents/archive/search` endpoint
-2. **Codex Agent**: Use `/api/agents/codex/analyze` endpoint
-3. **Discourse Agent**: Use `/api/agents/discourse/discuss` endpoint
-
-### Example Queries
-- "Multi-agent system architecture for blockchain governance"
-- "Offline key management best practices"
-- "Zero-knowledge proof authentication framework"
-- "Stablecoin implementation guidelines"
-- "Security supply chain governance"
-
-## Maintenance and Updates
-
-### Regular Updates
-- **Document Versioning**: Track changes and updates to documents
-- **Quality Assessment**: Regular review of document quality scores
-- **Correlation Updates**: Maintain knowledge correlations as new documents are added
-
-### Content Expansion
-- **New Sessions**: Add documents for new conference sessions
-- **Working Group Contributions**: Include community-contributed content
-- **Research Updates**: Incorporate latest research and developments
-
-### Privacy and Security
-- **Data Retention**: Automatic cleanup of outdated content
-- **Access Controls**: Role-based access to sensitive documents
-- **Audit Logging**: Comprehensive logging of all knowledge base activities
-
-## Future Enhancements
-
-### Planned Features
-- **Real-time Updates**: Live updates during conference sessions
-- **Collaborative Editing**: Multi-user document editing capabilities
-- **AI-powered Insights**: Automated analysis and recommendations
-- **Cross-platform Integration**: Integration with external knowledge sources
-
-### Research Areas
-- **Decentralized Knowledge Management**: Blockchain-based knowledge storage
-- **Privacy-preserving Analytics**: Advanced privacy protection for research
-- **Automated Governance**: AI-assisted policy development and analysis
-- **Cross-chain Knowledge Sharing**: Interoperability between different blockchain networks
-
-## Conclusion
-
-The updated Block 13 knowledge archives now provide a comprehensive, accurate representation of the conference's work items and research focus areas. The knowledge base supports the conference's goals of advancing blockchain governance, privacy-preserving technologies, and multi-agent systems through accessible, well-organized, and privacy-preserving knowledge management.
-
-For questions or contributions, please contact the BGIN working groups or use the Discourse integration for community discussions.
-
+*This document bridges the Block 13 knowledge-archive model with the current Block 14 app. For questions or contributions, see CONTRIBUTING.md and the BGIN working groups.*
