@@ -28,13 +28,17 @@ export default function MageHubPage() {
         router.replace('/ceremony');
         return;
       }
+      if (!localDB) {
+        setFeedLoading(false);
+        return;
+      }
       localDB.agentCard.toCollection().first().then((card) => {
         const wgs = card?.workingGroups?.length ? card.workingGroups.join(',') : 'ikp,fase,cyber,governance';
         signedFetch(`/api/curation/feed?workingGroups=${wgs}&limit=50&offset=0`, { method: 'GET' })
           .then((res) => res.json())
           .then((data) => {
             if (data.items) setFeedItems(data.items);
-            else setFeedError('Could not load spells');
+            else setFeedError('Could not load knowledge');
           })
           .catch((e) => setFeedError(e instanceof Error ? e.message : 'Failed'))
           .finally(() => setFeedLoading(false));
@@ -89,9 +93,9 @@ export default function MageHubPage() {
         </div>
       </section>
 
-      {/* Spells — BGIN projects & publications */}
+      {/* Knowledge — BGIN projects & publications */}
       <section>
-        <h2 className="text-lg font-semibold mb-3">Spells</h2>
+        <h2 className="text-lg font-semibold mb-3">Knowledge</h2>
         <p className="text-sm text-[var(--text-secondary)] mb-4">
           Publications and projects from BGIN working groups. Each spell links to a Mage that can help you explore the topic. Full list at{' '}
           <a href="https://bgin-global.org/projects" target="_blank" rel="noopener noreferrer" className="text-[var(--mage)] hover:underline">
@@ -102,10 +106,10 @@ export default function MageHubPage() {
           <p className="text-sm text-[var(--wg-cyber)] mb-3">{feedError}</p>
         )}
         {feedLoading ? (
-          <p className="text-[var(--text-muted)]">Loading spells…</p>
+          <p className="text-[var(--text-muted)]">Loading knowledge…</p>
         ) : feedItems.length === 0 ? (
           <p className="text-[var(--text-muted)]">
-            No spells for your working groups. Complete ceremony or adjust your profile to see BGIN publications and projects.
+            No knowledge for your working groups. Complete ceremony or adjust your profile to see BGIN publications and projects.
           </p>
         ) : (
           <div className="space-y-4">

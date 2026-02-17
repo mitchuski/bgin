@@ -82,4 +82,6 @@ class BGINLocalDB extends Dexie {
   }
 }
 
-export const localDB = new BGINLocalDB();
+// Only create DB in the browser; Dexie/IndexedDB are undefined in Node and cause 500s during SSR.
+export const localDB: BGINLocalDB | null =
+  typeof window !== 'undefined' ? new BGINLocalDB() : null;

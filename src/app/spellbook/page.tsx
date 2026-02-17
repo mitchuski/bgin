@@ -99,6 +99,21 @@ function SpellbookContent() {
         </p>
       </div>
 
+      <div className="flex gap-2 mb-6 border-b border-[var(--border)] pb-4">
+        <Link
+          href="/spellbook"
+          className="px-4 py-2 rounded-lg bg-[var(--mage)]/10 border border-[var(--mage)] text-sm font-medium"
+        >
+          📜 List View
+        </Link>
+        <Link
+          href="/spellbook/spellweb"
+          className="px-4 py-2 rounded-lg border border-[var(--border)] text-sm font-medium text-[var(--text-secondary)] hover:border-[var(--mage)] hover:text-[var(--mage)] transition-colors"
+        >
+          🕸️ Spellweb
+        </Link>
+      </div>
+
       {/* 🤝 Promises */}
       <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] overflow-hidden mb-6">
         <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--bg-tertiary)] flex items-center justify-between">

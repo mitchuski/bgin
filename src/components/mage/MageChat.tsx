@@ -68,6 +68,7 @@ export default function MageChat({ wg, embedded }: { wg: string; embedded?: bool
         router.replace('/ceremony');
         return;
       }
+      if (!localDB) return;
 
       const prefs = await localDB.privacyPreferences.get('default');
       const conversationHistory = messages.map((m) => ({

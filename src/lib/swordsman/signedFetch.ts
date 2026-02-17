@@ -7,6 +7,7 @@ import { signRequest } from './sign';
 import { localDB } from '@/lib/storage/local';
 
 export async function getParticipantId(): Promise<string | null> {
+  if (!localDB) return null;
   const card = await localDB.agentCard.toCollection().first();
   return card?.participantId ?? null;
 }

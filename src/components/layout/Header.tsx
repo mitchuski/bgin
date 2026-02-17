@@ -12,6 +12,7 @@ export default function Header() {
   const { setOpen: setMagePanelOpen } = useMagePanel();
 
   const loadCard = () => {
+    if (!localDB) return;
     localDB.agentCard.toCollection().first().then((card) => {
       setAgentCard(card ?? null);
     });

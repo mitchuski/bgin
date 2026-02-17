@@ -23,6 +23,7 @@ export interface KnowledgeMap {
 const CO_OCCURRENCE_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 
 export async function buildLocalKnowledgeMap(): Promise<KnowledgeMap> {
+  if (!localDB) return { nodes: [], edges: [] };
   const card = await localDB.agentCard.toCollection().first();
   const participantId = card?.participantId;
   if (!participantId) return { nodes: [], edges: [] };

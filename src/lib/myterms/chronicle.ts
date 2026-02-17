@@ -17,10 +17,12 @@ export interface AgreementRecord {
 }
 
 export async function storeAgreement(record: AgreementRecord): Promise<void> {
+  if (!localDB) throw new Error('IndexedDB not available');
   const row = { ...record, id: record.id || crypto.randomUUID() };
   await localDB.agreementChronicle.put(row);
 }
 
 export async function getActiveAgreements(): Promise<AgreementRecord[]> {
+  if (!localDB) return [];
   return localDB.agreementChronicle.where('status').equals('active').toArray();
 }

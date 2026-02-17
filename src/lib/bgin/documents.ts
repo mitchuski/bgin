@@ -1,6 +1,6 @@
 /**
  * BGIN projects & publications — from https://bgin-global.org/projects
- * Used for Spells feed, Mage context, and briefing references.
+ * Used for Knowledge feed, Mage context, and briefing references.
  */
 
 export type BginWorkingGroup = 'ikp' | 'fase' | 'cyber' | 'governance';

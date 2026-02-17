@@ -1,5 +1,5 @@
 /**
- * GET /api/curation/feed — Personalized knowledge feed (Spells). 04_PERSONAL_CURATION, 07_API_SPEC.
+ * GET /api/curation/feed — Personalized knowledge feed (Knowledge). 04_PERSONAL_CURATION, 07_API_SPEC.
  * Auth required. Query: workingGroups, limit, offset.
  * Items reference BGIN projects & publications: https://bgin-global.org/projects
  */

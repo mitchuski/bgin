@@ -49,6 +49,10 @@ export default function ProfilePage() {
         router.replace('/ceremony');
         return;
       }
+      if (!localDB) {
+        setLoading(false);
+        return;
+      }
       localDB.agentCard.toCollection().first().then((c) => {
         setCard(c ?? null);
         setLoading(false);

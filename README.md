@@ -8,7 +8,7 @@ Governance intelligence for the BGIN constellation: **Three Graphs, One Identity
 
 - **Block 14** — Homepage with timetable (March 1–2, 2026), links into sessions and Spellbook; Get started and promise/cast feeds on the side.
 - **Ceremony** — 8-step key ceremony: keygen, privacy preferences, MyTerms, working-group selection, agent card. Completing it gives you a Swordsman-style identity and unlocks Mages, Spellbook, and promises.
-- **Archive** — Knowledge tab: Talk to a Mage (by WG), Block 14 briefings, Knowledge map, and **Spells** (BGIN publications & projects from [bgin-global.org/projects](https://bgin-global.org/projects)), sorted by most recent.
+- **Archive** — Knowledge tab: Talk to a Mage (by WG), Block 14 briefings, Knowledge map, and **Knowledge** (BGIN publications & projects from [bgin-global.org/projects](https://bgin-global.org/projects)), sorted by most recent.
 - **Spellbook** — Promises, **Sessions** (cast by timetable session), **Spellbooks** (by working group), and **Recent casts**; all sections expandable. Casts come from Mage chat (Cast to session / Cast to spellbook). Each cast can have **✦ Inscribe proverb** to agree or add a proverb.
 - **Mage** — WG-specific chat (IKP, FASE, Cyber, Governance). Open via the **🧙** header button (side panel) or from Archive. Optional **RPP** (Relationship Proverb Protocol): Mage first divines a proverb connecting your context to the tale, then responds. After each reply: **Cast to session**, **Cast to spellbook**, or **✦ Inscribe proverb**.
 - **Proverbs** (`/proverb`) — Feed of proverbs (from Mage inscriptions, or inscribed on casts). Filters by WG. Connects proof of understanding to the knowledge-sharing system; proverbs linked to casts and promises strengthen the trust graph.
@@ -92,7 +92,7 @@ src/
     mage/                 # systemPrompts, rag, episodicMemory, privacyBudget
     auth/                 # signature verification
     swordsman/            # gate, sign, signedFetch
-    bgin/                  # BGIN documents (Spells)
+    bgin/                  # BGIN documents (Knowledge feed)
     block14/               # Block 14 timetable sessions
   components/
     ceremony/, mage/, layout/, dashboard/, workspace/, shared/, ui/

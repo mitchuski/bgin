@@ -81,6 +81,7 @@ export default function CeremonyPage() {
     try {
       const card = await createAgentCard(keys, privacy, selectedWgs, swordsmanName || undefined);
       await storeSwordsmanKeys(keys);
+      if (!localDB) throw new Error('IndexedDB not available');
       await localDB.privacyPreferences.put({ ...privacy, id: 'default' });
       await localDB.agentCard.put(card);
       setAgentCard(card);

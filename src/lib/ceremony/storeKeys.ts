@@ -6,6 +6,7 @@ import type { SwordsmanKeys } from './keygen';
 import { localDB } from '@/lib/storage/local';
 
 export async function storeSwordsmanKeys(keys: SwordsmanKeys): Promise<void> {
+  if (!localDB) throw new Error('IndexedDB not available');
   const publicKeyJwk = await crypto.subtle.exportKey('jwk', keys.publicKey);
   const privateKeyJwk = await crypto.subtle.exportKey('jwk', keys.privateKey);
 
@@ -22,6 +23,7 @@ export async function storeSwordsmanKeys(keys: SwordsmanKeys): Promise<void> {
 export async function loadSwordsmanKeys(
   participantId: string
 ): Promise<{ publicKey: CryptoKey; privateKey: CryptoKey } | null> {
+  if (!localDB) return null;
   const row = await localDB.swordsmanKeys.get(participantId);
   if (!row) return null;
 

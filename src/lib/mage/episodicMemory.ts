@@ -45,6 +45,7 @@ export async function updateEpisodicMemory(
       });
     }
   }
+  if (!localDB) return;
   for (const row of rows) {
     await localDB.episodicMemory.add(row);
   }
@@ -57,6 +58,7 @@ export async function getEpisodicContextForPrompt(
   workingGroup: string,
   limit = 10
 ): Promise<Array<{ topic?: string; summary?: string }>> {
+  if (!localDB) return [];
   const participantId = (await localDB.agentCard.toCollection().first())?.participantId;
   if (!participantId) return [];
 
