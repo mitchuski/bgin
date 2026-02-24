@@ -15,8 +15,10 @@ export type SpellwebNodeType =
 export type SpellwebLinkType =
   | 'grimoire'      // WG hub → spell (contains)
   | 'cluster'       // Session hub → spell (cast to session)
-  | 'sequence'       // spell → spell (casting order in session)
-  | 'constellation'; // spell → topic (cross-WG) or spell → proverb
+  | 'sequence'      // spell → spell (casting order in session)
+  | 'constellation' // spell → topic (cross-WG) or spell → proverb
+  | 'drawn'         // User-drawn link in draw mode
+  | 'saved';        // User-saved link (persisted to localStorage)
 
 export interface SpellwebNode {
   id: string;
