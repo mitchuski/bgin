@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -43,7 +43,7 @@ export default function WebPage() {
     });
   }, [router]);
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     Promise.all([
       fetch('/api/spellbook/entries').then((res) => res.json()),
       fetch('/api/proverbs').then((res) => res.json()),
@@ -67,6 +67,19 @@ export default function WebPage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Refetch when page becomes visible (e.g. after inscribing a proverb elsewhere) so new proverb nodes appear on the Web
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') fetchData();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [fetchData]);
 
   const spellwebData = useMemo(
     () => buildAgenticSpellweb(entries, proverbs),

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { signedFetch } from '@/lib/swordsman/signedFetch';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
@@ -41,9 +42,9 @@ export default function InscribeProverbButton({
       });
       const data = await res.json();
       if (res.ok) {
-        setSuccess('Proverb inscribed.');
+        setSuccess('Proverb inscribed. It will appear as a new node on the Web, linked to this cast.');
         setContent('');
-        setTimeout(() => { setOpen(false); setSuccess(null); }, 1500);
+        setTimeout(() => { setOpen(false); setSuccess(null); }, 3000);
       } else {
         setSuccess(data.message ?? 'Failed to inscribe');
       }
@@ -67,7 +68,14 @@ export default function InscribeProverbButton({
         <p className="text-sm text-[var(--text-secondary)] mb-3">
           Agree with this cast by inscribing a proverb. It will appear in the Proverb feed and strengthens the trust graph.
         </p>
-        {success && <p className="text-sm mb-3 text-[var(--mage)]">{success}</p>}
+        {success && (
+          <div className="text-sm mb-3 space-y-2">
+            <p className="text-[var(--mage)]">{success}</p>
+            <Link href="/web" className="inline-block text-xs text-[var(--mage)] hover:underline">
+              View on Web →
+            </Link>
+          </div>
+        )}
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
