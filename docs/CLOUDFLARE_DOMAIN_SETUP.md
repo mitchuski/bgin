@@ -1,6 +1,6 @@
 # Cloudflare Worker + Custom Domain Setup
 
-Your Next.js app deploys as a **Cloudflare Worker** (name: `bgin-ai`). There is no separate "Pages" project—the Worker is your app. Use the steps below to get the Worker running and attach your domain.
+Your Next.js app deploys as a **Cloudflare Worker** (name: `bginai`). There is no separate "Pages" project—the Worker is your app. Use the steps below to get the Worker running and attach your domain.
 
 ---
 
@@ -42,7 +42,7 @@ The Worker is your app’s origin. Cloudflare will create the DNS record and cer
 **In the dashboard:**
 
 1. Go to [Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers-and-pages).
-2. Open the **bgin-ai** Worker.
+2. Open the **bginai** Worker.
 3. Go to **Settings** → **Domains & Routes** → **Add** → **Custom Domain**.
 4. Enter the hostname, e.g.:
    - `app.yourdomain.com` (subdomain)
@@ -72,10 +72,10 @@ Use this if you already have a proxied (orange cloud) DNS record for the hostnam
 
 **In the dashboard:**
 
-1. [Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers-and-pages) → **bgin-ai** → **Settings** → **Domains & Routes** → **Add** → **Route**.
+1. [Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers-and-pages) → **bginai** → **Settings** → **Domains & Routes** → **Add** → **Route**.
 2. Choose the **Zone** (e.g. `yourdomain.com`).
 3. Route pattern: e.g. `app.yourdomain.com/*` or `yourdomain.com/*`.
-4. Select Worker **bgin-ai** and save.
+4. Select Worker **bginai** and save.
 
 **Or in `wrangler.jsonc`:**
 
@@ -101,8 +101,8 @@ Use your real zone name. Find **Zone ID** in the Cloudflare dashboard under the 
 | Goal                    | Where to do it |
 |-------------------------|----------------|
 | Deploy the app          | `npm run build` then `npm run deploy` (or Cloudflare build + deploy commands). |
-| Use a custom domain     | Workers & Pages → bgin-ai → Settings → Domains & Routes → Add **Custom Domain**. |
+| Use a custom domain     | Workers & Pages → bginai → Settings → Domains & Routes → Add **Custom Domain**. |
 | Use a route             | Same place → Add **Route** (zone + pattern), or add `routes` in `wrangler.jsonc`. |
 | Domain on Cloudflare    | Websites → Add a site → complete nameserver setup. |
 
-After adding the custom domain or route, traffic to that hostname will be served by your **bgin-ai** Worker (your Next.js app).
+After adding the custom domain or route, traffic to that hostname will be served by your **bginai** Worker (your Next.js app).

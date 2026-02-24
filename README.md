@@ -118,7 +118,7 @@ npm run lint
 
 ```bash
 npm run build          # build Next.js first
-npm run deploy         # deploy to Cloudflare (OpenNext; worker name: bgin-ai)
+npm run deploy         # deploy to Cloudflare (OpenNext; worker name: bginai)
 npm run preview        # build + local preview with Wrangler
 ```
 
@@ -128,11 +128,11 @@ Requires **Node.js ≥ 20** (Wrangler 4 and OpenNext deps need it). Use `.nvmrc`
 
 ## Deployment
 
-The app deploys as a **Cloudflare Worker** (name: `bgin-ai`) using [OpenNext for Cloudflare](https://opennext.js.org/cloudflare). Configuration: `wrangler.jsonc`, `open-next.config.ts`.
+The app deploys as a **Cloudflare Worker** (name: `bginai`) using [OpenNext for Cloudflare](https://opennext.js.org/cloudflare). Configuration: `wrangler.jsonc`, `open-next.config.ts`.
 
 - **Local deploy:** `npm run build` then `npm run deploy` (requires [Wrangler](https://developers.cloudflare.com/workers/wrangler/) auth: `npx wrangler login`).
 - **CI (Cloudflare):** If you can set the deploy command, use **Build:** `npm run build`, **Deploy:** `npm run deploy`. If the deploy command is fixed to `npx wrangler deploy`, use **Build:** `npm run build:cloudflare` instead (this runs Next + OpenNext so the deploy step finds `.open-next/`).
-- **Custom domain:** Attach your domain in [Workers & Pages](https://dash.cloudflare.com) → **bgin-ai** → Settings → Domains & Routes, or add `routes` in `wrangler.jsonc`. Full steps: **docs/CLOUDFLARE_DOMAIN_SETUP.md**.
+- **Custom domain:** Attach your domain in [Workers & Pages](https://dash.cloudflare.com) → **bginai** → Settings → Domains & Routes, or add `routes` in `wrangler.jsonc`. Full steps: **docs/CLOUDFLARE_DOMAIN_SETUP.md**.
 
 ---
 
