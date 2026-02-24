@@ -122,7 +122,7 @@ npm run deploy         # deploy to Cloudflare (OpenNext; worker name: bgin-ai)
 npm run preview        # build + local preview with Wrangler
 ```
 
-Requires **Node.js ≥ 18**. See [Deployment](#deployment) and **docs/CLOUDFLARE_DOMAIN_SETUP.md** for custom domains and CI setup.
+Requires **Node.js ≥ 20** (Wrangler 4 and OpenNext deps need it). Use `.nvmrc` or set `NODE_VERSION=20` in CI. See [Deployment](#deployment) and **docs/CLOUDFLARE_DOMAIN_SETUP.md** for custom domains and CI setup.
 
 ---
 
