@@ -15,8 +15,8 @@ npm run deploy
 
 Or on Cloudflare’s build system, set:
 
-- **Build command:** `npm run build`
-- **Deploy command:** `npm run deploy`
+- **If you can set the Deploy command:** use **Build:** `npm run build`, **Deploy:** `npm run deploy`.
+- **If the Deploy command is fixed to `npx wrangler deploy`:** use **Build:** `npm run build:cloudflare` (runs Next.js + OpenNext so the deploy step finds the compiled output). Leave **Deploy** as `npx wrangler deploy`.
 
 After deploy you get a `*.workers.dev` URL. For production, use a custom domain (below).
 

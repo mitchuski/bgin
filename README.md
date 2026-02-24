@@ -131,7 +131,7 @@ Requires **Node.js ≥ 20** (Wrangler 4 and OpenNext deps need it). Use `.nvmrc`
 The app deploys as a **Cloudflare Worker** (name: `bgin-ai`) using [OpenNext for Cloudflare](https://opennext.js.org/cloudflare). Configuration: `wrangler.jsonc`, `open-next.config.ts`.
 
 - **Local deploy:** `npm run build` then `npm run deploy` (requires [Wrangler](https://developers.cloudflare.com/workers/wrangler/) auth: `npx wrangler login`).
-- **CI (e.g. Cloudflare build):** Set **Build command** to `npm run build`, **Deploy command** to `npm run deploy`.
+- **CI (Cloudflare):** If you can set the deploy command, use **Build:** `npm run build`, **Deploy:** `npm run deploy`. If the deploy command is fixed to `npx wrangler deploy`, use **Build:** `npm run build:cloudflare` instead (this runs Next + OpenNext so the deploy step finds `.open-next/`).
 - **Custom domain:** Attach your domain in [Workers & Pages](https://dash.cloudflare.com) → **bgin-ai** → Settings → Domains & Routes, or add `routes` in `wrangler.jsonc`. Full steps: **docs/CLOUDFLARE_DOMAIN_SETUP.md**.
 
 ---
@@ -142,6 +142,7 @@ The app deploys as a **Cloudflare Worker** (name: `bgin-ai`) using [OpenNext for
 - **docs/DEMO_FLOW.md** — Demo order and quick path  
 - **docs/KNOWLEDGE_SHARING_AND_RPP.md** — Proverbs, RPP flow, and knowledge sharing  
 - **docs/CLOUDFLARE_DOMAIN_SETUP.md** — Connect a custom domain to the Cloudflare Worker  
+- **docs/TROUBLESHOOTING_404_ASSETS.md** — Fix 404s for JS/CSS chunks and favicon (e.g. use `build:cloudflare` on Cloudflare)  
 - **docs/README.md** — Pointer to block14_updates and 00  
 - **BLOCK_14_ALIGNMENT_COMPARISON.md** — Alignment with agentprivacy / Block 14 spec  
 - **BLOCK13_KNOWLEDGE_ARCHIVES.md** — Knowledge base context for ingestion  
