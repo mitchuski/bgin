@@ -63,6 +63,7 @@ export default function Header() {
         >
           📚 Archive
         </Link>
+        <Link href="/web" className="inline-flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--mage)]">🕸️ Web</Link>
         <button
           type="button"
           onClick={() => setMagePanelOpen(true)}

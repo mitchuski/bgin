@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getParticipantId } from '@/lib/swordsman/signedFetch';
 import RecentCastsFeed from '@/components/workspace/RecentCastsFeed';
 import InscribeProverbButton from '@/components/shared/InscribeProverbButton';
+import LearnButton from '@/components/shared/LearnButton';
 import { BLOCK14_TIMETABLE, BLOCK14_WORKING_GROUPS, getSessionsByDay } from '@/lib/block14/sessions';
 
 interface SpellbookEntry {
@@ -107,10 +108,10 @@ function SpellbookContent() {
           📜 List View
         </Link>
         <Link
-          href="/spellbook/spellweb"
+          href="/web"
           className="px-4 py-2 rounded-lg border border-[var(--border)] text-sm font-medium text-[var(--text-secondary)] hover:border-[var(--mage)] hover:text-[var(--mage)] transition-colors"
         >
-          🕸️ Spellweb
+          🕸️ Web
         </Link>
       </div>
 
@@ -202,7 +203,11 @@ function SpellbookContent() {
                         <div className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap mb-3">{e.mageResponse}</div>
                         {e.sources?.length > 0 && <div className="text-xs text-[var(--text-muted)]">Sources: {e.sources.map((s) => s.documentTitle).join(', ')}</div>}
                         {e.crossWgRefs?.length > 0 && <div className="text-xs text-[var(--text-muted)] mt-1">Cross-WG: {e.crossWgRefs.map((r) => r.workingGroup).join(', ')}</div>}
-                        <div className="mt-3 pt-2 border-t border-[var(--border)]">
+                        <div className="mt-3 pt-2 border-t border-[var(--border)] flex flex-wrap items-center gap-3">
+                          <LearnButton
+                            text={`Q: ${e.mageQuery}\n\n${e.mageResponse}${(e.sources?.length ?? 0) > 0 ? `\n\nSources: ${e.sources!.map((s) => s.documentTitle).join(', ')}` : ''}${(e.crossWgRefs?.length ?? 0) > 0 ? `\n\nCross-WG: ${e.crossWgRefs!.map((r) => r.workingGroup).join(', ')}` : ''}`}
+                            title="Copy cast"
+                          />
                           <InscribeProverbButton castEntryId={e.id} workingGroup={e.workingGroup} />
                         </div>
                       </div>
@@ -261,7 +266,11 @@ function SpellbookContent() {
                         <div className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap mb-3">{e.mageResponse}</div>
                         {e.sources?.length > 0 && <div className="text-xs text-[var(--text-muted)]">Sources: {e.sources.map((s) => s.documentTitle).join(', ')}</div>}
                         {e.crossWgRefs?.length > 0 && <div className="text-xs text-[var(--text-muted)] mt-1">Cross-WG: {e.crossWgRefs.map((r) => r.workingGroup).join(', ')}</div>}
-                        <div className="mt-3 pt-2 border-t border-[var(--border)]">
+                        <div className="mt-3 pt-2 border-t border-[var(--border)] flex flex-wrap items-center gap-3">
+                          <LearnButton
+                            text={`Q: ${e.mageQuery}\n\n${e.mageResponse}${(e.sources?.length ?? 0) > 0 ? `\n\nSources: ${e.sources!.map((s) => s.documentTitle).join(', ')}` : ''}${(e.crossWgRefs?.length ?? 0) > 0 ? `\n\nCross-WG: ${e.crossWgRefs!.map((r) => r.workingGroup).join(', ')}` : ''}`}
+                            title="Copy cast"
+                          />
                           <InscribeProverbButton castEntryId={e.id} workingGroup={e.workingGroup} />
                         </div>
                       </div>

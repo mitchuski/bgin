@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 import { MagePanelProvider } from '@/contexts/MagePanelContext';
 import MagePanel from '@/components/layout/MagePanel';
 
@@ -20,6 +21,7 @@ export default function RootLayout({
         <MagePanelProvider>
           <Header />
           <div className="flex-1">{children}</div>
+          <Footer />
           <MagePanel />
         </MagePanelProvider>
       </body>

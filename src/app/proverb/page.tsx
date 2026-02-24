@@ -7,6 +7,7 @@ import { getParticipantId, signedFetch } from '@/lib/swordsman/signedFetch';
 import { BLOCK14_WORKING_GROUPS } from '@/lib/block14/sessions';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
+import LearnButton from '@/components/shared/LearnButton';
 
 const WG_EMOJI: Record<string, string> = {
   ikp: '🔐',
@@ -213,7 +214,8 @@ export default function ProverbPage() {
                   {p.sourceType === 'cast_inscription' && '· Inscribed on cast'}
                   {p.sourceType === 'mage_response' && '· From Mage'}
                 </span>
-                <span className="text-xs text-[var(--text-muted)] ml-auto">
+                <span className="text-xs text-[var(--text-muted)] ml-auto flex items-center gap-2">
+                  <LearnButton text={p.content} title="Copy proverb" />
                   {new Date(p.createdAt).toLocaleString()}
                 </span>
               </div>

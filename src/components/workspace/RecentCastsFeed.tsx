@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import WGBadge from '@/components/shared/WGBadge';
 import InscribeProverbButton from '@/components/shared/InscribeProverbButton';
+import LearnButton from '@/components/shared/LearnButton';
 import { BLOCK14_TIMETABLE } from '@/lib/block14/sessions';
 
 const WG_EMOJI: Record<string, string> = {
@@ -107,7 +108,11 @@ export default function RecentCastsFeed({ embedded }: { embedded?: boolean }) {
                 {new Date(e.addedAt).toLocaleString()}
                 {isExpanded && <span className="ml-2 text-[var(--mage)]">· Click to collapse</span>}
               </p>
-              <div className="mt-2 pt-2 border-t border-[var(--border)]" onClick={(ev) => ev.stopPropagation()}>
+              <div className="mt-2 pt-2 border-t border-[var(--border)] flex flex-wrap items-center gap-3" onClick={(ev) => ev.stopPropagation()}>
+                <LearnButton
+                  text={`Q: ${e.mageQuery}\n\n${e.mageResponse}${(e.sources?.length ?? 0) > 0 ? `\n\nSources: ${e.sources!.map((s) => s.documentTitle).join(', ')}` : ''}${(e.crossWgRefs?.length ?? 0) > 0 ? `\n\nCross-WG: ${e.crossWgRefs!.map((r) => r.workingGroup).join(', ')}` : ''}`}
+                  title="Copy cast"
+                />
                 <InscribeProverbButton castEntryId={e.id} workingGroup={e.workingGroup} />
               </div>
             </div>

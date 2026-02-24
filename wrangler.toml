@@ -1,0 +1,15 @@
+# Cloudflare Pages — BGIN AI Block 14
+# See CLOUDFLARE_PAGES_DEPLOYMENT.md for full setup.
+
+name = "bgin"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+NEXT_PUBLIC_APP_URL = "https://bgin.ai"
+
+[env.production.vars]
+NEXT_PUBLIC_APP_URL = "https://bgin.ai"
+
+[env.preview.vars]
+NEXT_PUBLIC_APP_URL = "https://preview.bgin.pages.dev"

@@ -13,6 +13,7 @@ const GLYPH_ICONS: Record<string, string> = {
   spell: '✨',
   topic: '💡',
   source: '📄',
+  proverb: '✦',
 };
 
 export default function GlyphInspector({ glyph }: GlyphInspectorProps) {
@@ -83,6 +84,21 @@ export default function GlyphInspector({ glyph }: GlyphInspectorProps) {
           >
             View in Spellbook →
           </Link>
+        )}
+
+        {glyph.type === 'proverb' && glyph.metadata?.content && (
+          <div>
+            <p className="text-xs text-[var(--text-muted)] mb-1">Proverb (RPP)</p>
+            <p className="text-sm text-[var(--text-secondary)] italic">&ldquo;{glyph.metadata.content}&rdquo;</p>
+            {glyph.metadata.castEntryId && (
+              <Link
+                href={`/proverb?castEntryId=${glyph.metadata.castEntryId}`}
+                className="inline-block text-xs text-[var(--mage)] hover:underline mt-2"
+              >
+                View proverbs for this cast →
+              </Link>
+            )}
+          </div>
         )}
 
         {glyph.type === 'grimoire' && (

@@ -28,7 +28,8 @@ export default function SpellwebNavigatorCanvas({
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!containerRef.current || entries.length === 0) return;
+    const container = containerRef.current;
+    if (!container || entries.length === 0) return;
 
     const spellweb = buildSpellweb(entries);
     const filteredGlyphs = grimoireFilter
@@ -58,13 +59,19 @@ export default function SpellwebNavigatorCanvas({
         },
       });
 
-      const sigma = new Sigma(graph, containerRef.current, {
+      const sigma = new Sigma(graph, container, {
         renderEdgeLabels: false,
         defaultNodeColor: '#6B7280',
         defaultEdgeColor: '#E5E7EB',
         labelRenderedSizeThreshold: 8,
+        allowInvalidContainer: true,
       });
       sigmaRef.current = sigma;
+
+      const ro = new ResizeObserver(() => {
+        sigma.refresh();
+      });
+      ro.observe(container);
 
       sigma.on('enterNode', ({ node }) => {
         setHoveredLabel(graph.getNodeAttribute(node, 'label') ?? node);
@@ -78,6 +85,7 @@ export default function SpellwebNavigatorCanvas({
       sigma.on('clickStage', () => onGlyphSelect?.(null));
 
       return () => {
+        ro.disconnect();
         sigma.kill();
         sigmaRef.current = null;
       };
@@ -88,11 +96,11 @@ export default function SpellwebNavigatorCanvas({
   }, [entries, grimoireFilter, onGlyphSelect]);
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <div
         ref={containerRef}
-        className="rounded-lg border border-[var(--border)] bg-[var(--bg-primary)] min-h-[500px]"
-        style={{ height: 500 }}
+        className="rounded-lg border border-[var(--border)] bg-[var(--bg-primary)] min-h-[500px] w-full"
+        style={{ width: '100%', minWidth: 1, height: 500 }}
       />
       {hoveredLabel && (
         <div className="absolute bottom-4 left-4 bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm shadow">

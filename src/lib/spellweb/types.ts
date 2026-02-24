@@ -9,6 +9,7 @@ export type GlyphType =
   | 'session' // A Block 14 session
   | 'topic'   // An extracted topic/concept
   | 'source'  // A referenced document
+  | 'proverb' // RPP proverb (inscribed on cast or from Mage)
   | 'grimoire'; // A working group container
 
 export interface Glyph {
@@ -23,6 +24,10 @@ export interface Glyph {
     query?: string;
     sessionId?: string;
     documentTitle?: string;
+    /** RPP proverb content when type is proverb */
+    content?: string;
+    castEntryId?: string;
+    proverbId?: string;
   };
 }
 
