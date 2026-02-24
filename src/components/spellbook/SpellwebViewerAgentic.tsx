@@ -355,7 +355,7 @@ export default function SpellwebViewerAgentic({
       style={fullscreen ? undefined : fullHeight ? { width: '100%', height: '100%' } : { minHeight: 500 }}
     >
       <ForceGraph2D
-        ref={fgRef}
+        ref={fgRef as any}
         graphData={graphData}
         nodeId="id"
         nodeCanvasObject={nodeCanvasObject}

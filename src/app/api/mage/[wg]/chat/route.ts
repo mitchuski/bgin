@@ -40,9 +40,10 @@ function buildSystemPrompt(
 
 export async function POST(
   request: Request,
-  { params }: { params: { wg: string } }
+  { params }: { params: Promise<{ wg: string }> }
 ) {
-  const wg = params.wg?.toLowerCase() ?? '';
+  const { wg: wgParam } = await params;
+  const wg = wgParam?.toLowerCase() ?? '';
   if (!VALID_WGS.includes(wg)) {
     return NextResponse.json(
       { error: 'invalid_wg', message: 'Unknown working group' },

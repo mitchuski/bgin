@@ -11,7 +11,7 @@ const VALID_ASSESSMENTS = ['verified', 'partial', 'not_verified'] as const;
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const bodyText = await request.text();
   const auth = await verifyRequest(request, bodyText);
@@ -22,7 +22,8 @@ export async function POST(
     );
   }
 
-  const promise = await getPromise(params.id);
+  const { id } = await params;
+  const promise = await getPromise(id);
   if (!promise) {
     return NextResponse.json(
       { error: 'not_found', message: 'Promise not found' },
@@ -70,7 +71,7 @@ export async function POST(
   }
 
   const payload = JSON.stringify({
-    promiseId: params.id,
+    promiseId: id,
     assessment,
   });
   const ok = await verifySignature(participant.publicKeyHex, payload, signature);
@@ -82,9 +83,9 @@ export async function POST(
   }
 
   const updated = await addPeerAssessment(
-    params.id,
+    id,
     auth.participantId,
     assessment as 'verified' | 'partial' | 'not_verified'
   );
-  return NextResponse.json(updated ?? { promiseId: params.id });
+  return NextResponse.json(updated ?? { promiseId: id });
 }

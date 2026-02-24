@@ -9,7 +9,7 @@ Governance intelligence for the BGIN constellation: **Three Graphs, One Identity
 - **Block 14** — Homepage with timetable (March 1–2, 2026), links into sessions and Spellbook; Get started and promise/cast feeds on the side.
 - **Ceremony** — 8-step key ceremony: keygen, privacy preferences, MyTerms, working-group selection, agent card. Completing it gives you a Swordsman-style identity and unlocks Mages, Spellbook, and promises.
 - **Archive** — Knowledge tab: Talk to a Mage (by WG), Block 14 briefings, Knowledge map, and **Knowledge** (BGIN publications & projects from [bgin-global.org/projects](https://bgin-global.org/projects)), sorted by most recent.
-- **Spellbook** — Promises, **Sessions** (cast by timetable session), **Spellbooks** (by working group), and **Recent casts**; all sections expandable. Casts come from Mage chat (Cast to session / Cast to spellbook). Each cast can have **✦ Inscribe proverb** to agree or add a proverb.
+- **Spellbook** — Promises, **Sessions** (cast by timetable session), **Spellbooks** (by working group), and **Recent casts**; all sections expandable. The **Spellweb** tab shows an interactive graph (constellation view or draw mode to add your own links). Casts come from Mage chat (Cast to session / Cast to spellbook). Each cast can have **✦ Inscribe proverb** to agree or add a proverb.
 - **Mage** — WG-specific chat (IKP, FASE, Cyber, Governance). Open via the **🧙** header button (side panel) or from Archive. Optional **RPP** (Relationship Proverb Protocol): Mage first divines a proverb connecting your context to the tale, then responds. After each reply: **Cast to session**, **Cast to spellbook**, or **✦ Inscribe proverb**.
 - **Proverbs** (`/proverb`) — Feed of proverbs (from Mage inscriptions, or inscribed on casts). Filters by WG. Connects proof of understanding to the knowledge-sharing system; proverbs linked to casts and promises strengthen the trust graph.
 - **Promises** — Single `/promises` page for all WGs; voluntary commitments and assessment flows. When creating a promise you can optionally **connect a proverb** (proof of understanding) to the commitment; it appears on the promise card and is signed with the promise.
@@ -63,7 +63,8 @@ The step-by-step roadmap is **`00_IMPLEMENTATION_PLAN.md`** (Phases 0–12). All
 
 ## Tech stack
 
-- **Framework:** Next.js 14+ (TypeScript), App Router  
+- **Framework:** Next.js 15 (TypeScript), App Router  
+- **Deployment:** Cloudflare Workers via [OpenNext for Cloudflare](https://opennext.js.org/cloudflare) (see [Deployment](#deployment) below)  
 - **AI:** Anthropic (Claude) or NEAR Cloud AI for Mage; set `ANTHROPIC_API_KEY` or `NEAR_AI_API_KEY` in `.env`  
 - **Key management:** WebCrypto API (Ed25519)  
 - **Local storage:** IndexedDB via Dexie.js  
@@ -95,7 +96,7 @@ src/
     bgin/                  # BGIN documents (Knowledge feed)
     block14/               # Block 14 timetable sessions
   components/
-    ceremony/, mage/, layout/, dashboard/, workspace/, shared/, ui/
+    ceremony/, mage/, layout/, dashboard/, workspace/, spellbook/, shared/, ui/
   contexts/
     MagePanelContext.tsx  # Side panel open state for Mage chat
 ```
@@ -110,7 +111,28 @@ cp .env.example .env   # then set ANTHROPIC_API_KEY or NEAR_AI_API_KEY
 npm run dev            # http://localhost:3000
 npm run build
 npm run start
+npm run lint
 ```
+
+**Deployment (Cloudflare Workers):**
+
+```bash
+npm run build          # build Next.js first
+npm run deploy         # deploy to Cloudflare (OpenNext; worker name: bgin-ai)
+npm run preview        # build + local preview with Wrangler
+```
+
+Requires **Node.js ≥ 18**. See [Deployment](#deployment) and **docs/CLOUDFLARE_DOMAIN_SETUP.md** for custom domains and CI setup.
+
+---
+
+## Deployment
+
+The app deploys as a **Cloudflare Worker** (name: `bgin-ai`) using [OpenNext for Cloudflare](https://opennext.js.org/cloudflare). Configuration: `wrangler.jsonc`, `open-next.config.ts`.
+
+- **Local deploy:** `npm run build` then `npm run deploy` (requires [Wrangler](https://developers.cloudflare.com/workers/wrangler/) auth: `npx wrangler login`).
+- **CI (e.g. Cloudflare build):** Set **Build command** to `npm run build`, **Deploy command** to `npm run deploy`.
+- **Custom domain:** Attach your domain in [Workers & Pages](https://dash.cloudflare.com) → **bgin-ai** → Settings → Domains & Routes, or add `routes` in `wrangler.jsonc`. Full steps: **docs/CLOUDFLARE_DOMAIN_SETUP.md**.
 
 ---
 
@@ -119,6 +141,7 @@ npm run start
 - **docs/PROJECT_STATUS.md** — What’s connected, API ↔ UI map, where it can break  
 - **docs/DEMO_FLOW.md** — Demo order and quick path  
 - **docs/KNOWLEDGE_SHARING_AND_RPP.md** — Proverbs, RPP flow, and knowledge sharing  
+- **docs/CLOUDFLARE_DOMAIN_SETUP.md** — Connect a custom domain to the Cloudflare Worker  
 - **docs/README.md** — Pointer to block14_updates and 00  
 - **BLOCK_14_ALIGNMENT_COMPARISON.md** — Alignment with agentprivacy / Block 14 spec  
 - **BLOCK13_KNOWLEDGE_ARCHIVES.md** — Knowledge base context for ingestion  

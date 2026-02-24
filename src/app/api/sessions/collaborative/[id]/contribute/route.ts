@@ -11,9 +11,10 @@ import { addSpellbookEntry, type SpellbookEntryRow } from '@/lib/storage/server-
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const sessionId = params.id ?? '';
+  const { id: sessionIdParam } = await params;
+  const sessionId = sessionIdParam ?? '';
   const session = await getCollaborativeSession(sessionId);
   if (!session) {
     return NextResponse.json(

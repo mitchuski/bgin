@@ -12,7 +12,7 @@ const VALID_STATUSES = ['active', 'in_progress', 'completed', 'withdrawn'] as co
 
 export async function GET(
   req: Request,
-  ctx: { params: { id: string } }
+  ctx: { params: Promise<{ id: string }> }
 ) {
   const auth = await verifyRequestNoBody(req);
   if (!auth.valid) {
@@ -21,7 +21,8 @@ export async function GET(
       { status: 401 }
     );
   }
-  const promise = await getPromise(ctx.params.id);
+  const { id } = await ctx.params;
+  const promise = await getPromise(id);
   if (!promise) {
     return NextResponse.json(
       { error: 'not_found', message: 'Promise not found' },
@@ -33,7 +34,7 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  ctx: { params: { id: string } }
+  ctx: { params: Promise<{ id: string }> }
 ) {
   const bodyText = await request.text();
   const auth = await verifyRequest(request, bodyText);
@@ -44,7 +45,8 @@ export async function PATCH(
     );
   }
 
-  const promise = await getPromise(ctx.params.id);
+  const { id } = await ctx.params;
+  const promise = await getPromise(id);
   if (!promise) {
     return NextResponse.json(
       { error: 'not_found', message: 'Promise not found' },
@@ -89,7 +91,7 @@ export async function PATCH(
     const participant = await getParticipant(auth.participantId);
     if (participant) {
       const payload = JSON.stringify({
-        promiseId: ctx.params.id,
+        promiseId: id,
         status: updates.status ?? promise.status,
         selfAssessmentNote: updates.selfAssessmentNote ?? promise.selfAssessmentNote ?? null,
       });
@@ -103,6 +105,6 @@ export async function PATCH(
     }
   }
 
-  const updated = await updatePromise(ctx.params.id, updates);
-  return NextResponse.json(updated ?? { id: ctx.params.id });
+  const updated = await updatePromise(id, updates);
+  return NextResponse.json(updated ?? { id });
 }
