@@ -27,9 +27,9 @@ function SpellbookContent() {
   const searchParams = useSearchParams();
   const sessionFromUrl = useMemo(() => searchParams.get('session'), [searchParams]);
   const [allEntries, setAllEntries] = useState<SpellbookEntry[]>([]);
-  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(sessionFromUrl || null);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [selectedWg, setSelectedWg] = useState<string | null>(null);
-  const [sessionsExpanded, setSessionsExpanded] = useState(!!sessionFromUrl);
+  const [sessionsExpanded, setSessionsExpanded] = useState(false);
   const [wgSpellbookExpanded, setWgSpellbookExpanded] = useState(false);
   const [recentCastsExpanded, setRecentCastsExpanded] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -198,7 +198,7 @@ function SpellbookContent() {
                   <div className="space-y-6">
                     {selectedEntries.map((e) => (
                       <div key={e.id} className="rounded-lg border border-[var(--border)] p-4 bg-[var(--bg-primary)]">
-                        <p className="text-xs text-[var(--text-muted)] mb-1">{new Date(e.addedAt).toLocaleString()} · {e.attributionLevel}</p>
+                        <p className="text-xs text-[var(--text-muted)] mb-1">{new Date(e.addedAt).toLocaleString('en-US')} · {e.attributionLevel}</p>
                         <p className="font-medium text-sm text-[var(--mage)] mb-2">Q: {e.mageQuery}</p>
                         <div className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap mb-3">{e.mageResponse}</div>
                         {e.sources?.length > 0 && <div className="text-xs text-[var(--text-muted)]">Sources: {e.sources.map((s) => s.documentTitle).join(', ')}</div>}
@@ -248,7 +248,7 @@ function SpellbookContent() {
                 >
                   <span className="text-xl">{g.emoji}</span>
                   <span className="ml-2 font-medium">{g.label} Spellbook</span>
-                  <p className="text-sm text-[var(--text-muted)] mt-1">{(entriesByWg[g.id] ?? []).length} entr{(entriesByWg[g.id] ?? []).length === 1 ? 'y' : 'ies'}</p>
+                  <span className="block text-sm text-[var(--text-muted)] mt-1">{(entriesByWg[g.id] ?? []).length} entr{(entriesByWg[g.id] ?? []).length === 1 ? 'y' : 'ies'}</span>
                 </button>
               ))}
             </div>
@@ -261,7 +261,7 @@ function SpellbookContent() {
                   <div className="space-y-6">
                     {selectedWgEntries.map((e) => (
                       <div key={e.id} className="rounded-lg border border-[var(--border)] p-4 bg-[var(--bg-primary)]">
-                        <p className="text-xs text-[var(--text-muted)] mb-1">{new Date(e.addedAt).toLocaleString()} · {e.sessionTitle} · {e.attributionLevel}</p>
+                        <p className="text-xs text-[var(--text-muted)] mb-1">{new Date(e.addedAt).toLocaleString('en-US')} · {e.sessionTitle} · {e.attributionLevel}</p>
                         <p className="font-medium text-sm text-[var(--mage)] mb-2">Q: {e.mageQuery}</p>
                         <div className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap mb-3">{e.mageResponse}</div>
                         {e.sources?.length > 0 && <div className="text-xs text-[var(--text-muted)]">Sources: {e.sources.map((s) => s.documentTitle).join(', ')}</div>}

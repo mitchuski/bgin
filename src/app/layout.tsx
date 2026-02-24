@@ -8,6 +8,7 @@ import MagePanel from '@/components/layout/MagePanel';
 export const metadata: Metadata = {
   title: 'BGIN AI — Governance Intelligence',
   description: 'Three graphs, one identity. Sovereign governance intelligence for the BGIN constellation.',
+  icons: { icon: '/icon' },
 };
 
 export default function RootLayout({
