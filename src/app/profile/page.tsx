@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { localDB } from '@/lib/storage/local';
 import type { AgentCard } from '@/lib/ceremony/agentCard';
 import { getParticipantId, signedFetch } from '@/lib/swordsman/signedFetch';
@@ -32,7 +31,6 @@ interface CastRow {
 }
 
 export default function ProfilePage() {
-  const router = useRouter();
   const [card, setCard] = useState<AgentCard | null>(null);
   const [loading, setLoading] = useState(true);
   const [myProverbsExpanded, setMyProverbsExpanded] = useState(false);
@@ -44,12 +42,8 @@ export default function ProfilePage() {
 
   useEffect(() => {
     getParticipantId().then((id) => {
-      if (!id) {
-        setLoading(false);
-        router.replace('/ceremony');
-        return;
-      }
-      if (!localDB) {
+      if (!id || !localDB) {
+        setCard(null);
         setLoading(false);
         return;
       }
@@ -58,12 +52,16 @@ export default function ProfilePage() {
         setLoading(false);
       });
     });
-  }, [router]);
+  }, []);
 
   const fetchMyProverbs = useCallback(async () => {
     setProverbsLoading(true);
     try {
       const res = await signedFetch('/api/proverbs?mine=1&limit=30', { method: 'GET' });
+      if (!res.ok) {
+        setMyProverbs([]);
+        return;
+      }
       const data = await res.json();
       setMyProverbs(data.proverbs ?? []);
     } catch {
@@ -77,6 +75,10 @@ export default function ProfilePage() {
     setCastsLoading(true);
     try {
       const res = await signedFetch('/api/spellbook/entries?mine=1', { method: 'GET' });
+      if (!res.ok) {
+        setMyCasts([]);
+        return;
+      }
       const data = await res.json();
       setMyCasts(data.entries ?? []);
     } catch {

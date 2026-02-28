@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect, useMemo, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { getParticipantId } from '@/lib/swordsman/signedFetch';
 import RecentCastsFeed from '@/components/workspace/RecentCastsFeed';
 import InscribeProverbButton from '@/components/shared/InscribeProverbButton';
 import LearnButton from '@/components/shared/LearnButton';
@@ -23,7 +22,6 @@ interface SpellbookEntry {
 }
 
 function SpellbookContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const sessionFromUrl = useMemo(() => searchParams.get('session'), [searchParams]);
   const [allEntries, setAllEntries] = useState<SpellbookEntry[]>([]);
@@ -34,11 +32,6 @@ function SpellbookContent() {
   const [recentCastsExpanded, setRecentCastsExpanded] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    getParticipantId().then((id) => {
-      if (!id) router.replace('/ceremony');
-    });
-  }, [router]);
 
   useEffect(() => {
     if (sessionFromUrl && BLOCK14_TIMETABLE.some((s) => s.id === sessionFromUrl)) {

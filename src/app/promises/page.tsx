@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getParticipantId } from '@/lib/swordsman/signedFetch';
 import PromiseBoard from '@/components/workspace/PromiseBoard';
 
 const WGS = [
@@ -14,14 +12,6 @@ const WGS = [
 ];
 
 export default function AllPromisesPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    getParticipantId().then((id) => {
-      if (!id) router.replace('/ceremony');
-    });
-  }, [router]);
-
   useEffect(() => {
     const hash = typeof window !== 'undefined' ? window.location.hash.slice(1) : '';
     if (hash && WGS.some((w) => w.id === hash)) {

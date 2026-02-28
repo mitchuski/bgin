@@ -1,34 +1,24 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getParticipantId } from '@/lib/swordsman/signedFetch';
 import { buildLocalKnowledgeMap, type KnowledgeNode } from '@/lib/curation/localMap';
 import KnowledgeGraph from '@/components/dashboard/KnowledgeGraph';
 
 export default function KnowledgeMapPage() {
-  const router = useRouter();
   const [nodes, setNodes] = useState<KnowledgeNode[]>([]);
   const [edges, setEdges] = useState<Array<{ source: string; target: string; strength: number }>>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getParticipantId().then((id) => {
-      if (!id) {
-        setLoading(false);
-        router.replace('/ceremony');
-        return;
-      }
-      setLoading(true);
-      buildLocalKnowledgeMap()
-        .then((map) => {
-          setNodes(map.nodes);
-          setEdges(map.edges);
-        })
-        .finally(() => setLoading(false));
-    });
-  }, [router]);
+    buildLocalKnowledgeMap()
+      .then((map) => {
+        setNodes(map.nodes);
+        setEdges(map.edges);
+      })
+      .catch(() => { setNodes([]); setEdges([]); })
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <main className="min-h-screen p-8 max-w-4xl mx-auto">

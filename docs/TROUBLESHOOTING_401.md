@@ -72,4 +72,12 @@ Then `signedFetch` throws before sending (“No agent card: complete ceremony fi
 
 ---
 
+---
+
+## Chrome extension message
+
+**"A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received"** — This comes from a **browser extension** (e.g. ad blocker, password manager, React DevTools), not from the app. You can ignore it or disable extensions on this site if it bothers you. It does not cause 401 or break Mage chat.
+
+---
+
 See also: [MAGE_DEPLOYMENT.md](./MAGE_DEPLOYMENT.md) (Mage in production), [CLOUDFLARE_DOMAIN_SETUP.md](./CLOUDFLARE_DOMAIN_SETUP.md) (env and domain).

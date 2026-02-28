@@ -3,13 +3,10 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { getParticipantId } from '@/lib/swordsman/signedFetch';
 import { BLOCK14_WORKING_GROUPS } from '@/lib/block14/sessions';
 import type { SpellbookEntryInput } from '@/lib/spellweb/builder';
 import type { ProverbInput } from '@/lib/spellweb/builder-agentic';
 import { buildAgenticSpellweb } from '@/lib/spellweb/builder-agentic';
-import { getSpellwebDummyEntries } from '@/lib/spellweb/dummyData';
 
 const SpellwebViewerAgentic = dynamic(
   () => import('@/components/spellbook/SpellwebViewerAgentic'),
@@ -32,17 +29,9 @@ const WG_COLORS: Record<string, string> = {
 };
 
 export default function WebPage() {
-  const router = useRouter();
   const [entries, setEntries] = useState<SpellbookEntryInput[]>([]);
   const [proverbs, setProverbs] = useState<ProverbInput[]>([]);
   const [loading, setLoading] = useState(true);
-  const [usingDummyData, setUsingDummyData] = useState(false);
-
-  useEffect(() => {
-    getParticipantId().then((id) => {
-      if (!id) router.replace('/ceremony');
-    });
-  }, [router]);
 
   const fetchData = useCallback(() => {
     Promise.all([
@@ -52,18 +41,11 @@ export default function WebPage() {
       .then(([entriesData, proverbsData]) => {
         const apiEntries = (entriesData.entries ?? []) as SpellbookEntryInput[];
         const apiProverbs = (proverbsData.proverbs ?? []) as ProverbInput[];
-        if (apiEntries.length > 0) {
-          setEntries(apiEntries);
-          setUsingDummyData(false);
-        } else {
-          setEntries(getSpellwebDummyEntries());
-          setUsingDummyData(true);
-        }
+        setEntries(apiEntries);
         setProverbs(apiProverbs);
       })
       .catch(() => {
-        setEntries(getSpellwebDummyEntries());
-        setUsingDummyData(true);
+        setEntries([]);
         setProverbs([]);
       })
       .finally(() => setLoading(false));
@@ -104,11 +86,6 @@ export default function WebPage() {
           <h1 className="text-lg font-semibold text-[var(--text-primary)]">
             🕸️ Web
           </h1>
-          {usingDummyData && (
-            <span className="text-xs text-[var(--text-muted)]">
-              Demo data
-            </span>
-          )}
         </div>
         {/* Legend: WG colors + emoji (display only, no toggle) */}
         <div className="flex items-center gap-3">

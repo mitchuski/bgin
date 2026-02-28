@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getParticipantId } from '@/lib/swordsman/signedFetch';
 import SpellbookSession from '@/components/workspace/SpellbookSession';
 
 interface SessionSummary {
@@ -33,17 +31,13 @@ const WG_COLORS: Record<string, string> = {
 };
 
 export default function Block14SpellbookPage() {
-  const router = useRouter();
   const [sessionSummaries, setSessionSummaries] = useState<SessionSummary[]>([]);
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getParticipantId().then((id) => {
-      if (!id) router.replace('/ceremony');
-    });
     fetchSessions();
-  }, [router]);
+  }, []);
 
   const fetchSessions = async () => {
     try {

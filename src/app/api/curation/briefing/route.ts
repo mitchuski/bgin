@@ -1,6 +1,6 @@
 /**
  * GET /api/curation/briefing?meetingId=block-14 — Pre-meeting briefing. 04_PERSONAL_CURATION, 07_API_SPEC.
- * Auth required.
+ * Open: no auth required. Uses default WGs when unauthenticated.
  */
 
 import { NextResponse } from 'next/server';
@@ -46,14 +46,7 @@ const STUB_AGENDA: Record<string, string[]> = {
 
 export async function GET(request: Request) {
   const auth = await verifyRequestNoBody(request);
-  if (!auth.valid) {
-    return NextResponse.json(
-      { error: 'unauthorized', message: auth.error ?? 'Authentication required' },
-      { status: 401 }
-    );
-  }
-
-  const participant = await getParticipant(auth.participantId);
+  const participant = auth.valid ? await getParticipant(auth.participantId) : null;
   const wgs = participant?.workingGroups?.length
     ? participant.workingGroups
     : ['ikp', 'fase', 'cyber', 'governance'];

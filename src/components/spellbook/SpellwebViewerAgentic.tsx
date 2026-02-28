@@ -109,6 +109,8 @@ export default function SpellwebViewerAgentic({
   const [pulse, setPulse] = useState(false);
   /** When true, nodes show only emoji + colour; when false, show labels too. */
   const [evokeMode, setEvokeMode] = useState(true);
+  /** Sidebar (panel) open: like spellweb directory, one big screen with overlay panel when open. */
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<{ d3Force: (name: string, fn?: unknown) => unknown; d3ReheatSimulation: () => void } | null>(null);
@@ -163,6 +165,11 @@ export default function SpellwebViewerAgentic({
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [fullscreen]);
+
+  // Open sidebar when user selects a node (so they can Reflect/Connect)
+  useEffect(() => {
+    if (selectedNodeId) setSidebarOpen(true);
+  }, [selectedNodeId]);
 
   useEffect(() => {
     if (!fullHeight || !containerRef.current) return;
@@ -458,16 +465,11 @@ export default function SpellwebViewerAgentic({
     );
   }
 
-  const scrollToDetails = useCallback(() => {
-    rightPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, []);
-
-  // Right side panel component - spellweb styled; min-h-0 so it scrolls inside flex layout
+  // Right side panel component - spellweb styled; min-h-0 so it scrolls inside flex layout; clean edges
   const rightPanel = (isExpanded: boolean) => (
     <div
       ref={rightPanelRef}
-      className={`flex flex-col gap-3 min-h-0 ${isExpanded ? 'w-[260px]' : 'w-[240px]'} shrink-0 p-4 border-l bg-[#0c0c18] overflow-y-auto`}
-      style={{ borderColor: '#1a1a30' }}
+      className={`flex flex-col gap-3 min-h-0 ${isExpanded ? 'w-[260px]' : 'w-[240px]'} shrink-0 p-4 overflow-y-auto border-l border-r border-[#1a1a30] bg-[#0c0c18] shadow-[-2px_0_16px_rgba(0,0,0,0.35)]`}
     >
       {/* Top controls - spellweb filter button style */}
       <div className="rounded-lg p-3 flex flex-col gap-1" style={{ background: '#06060e', border: '1px solid #1a1a30' }}>
@@ -486,23 +488,6 @@ export default function SpellwebViewerAgentic({
           <span aria-hidden>🔮</span>
           Evoke {evokeMode ? '(emoji)' : '(text)'}
         </button>
-        {selectedNodeId && (
-          <button
-            type="button"
-            onClick={scrollToDetails}
-            className="flex items-center gap-2 px-3 py-2 rounded text-xs transition-all duration-150"
-            style={{
-              fontFamily: '"IBM Plex Sans", sans-serif',
-              background: 'transparent',
-              border: '1px solid transparent',
-              color: '#666680',
-            }}
-            title="Scroll to Connect & Reflect panel"
-          >
-            <span aria-hidden>🪞</span>
-            Details
-          </button>
-        )}
         <button
           type="button"
           onClick={() => { setLayoutKey((k) => k + 1); setPulse(true); }}
@@ -532,28 +517,6 @@ export default function SpellwebViewerAgentic({
         >
           <span aria-hidden>{isExpanded ? '✕' : '⛶'}</span>
           {isExpanded ? 'Close' : 'Expand'}
-        </button>
-        <button
-          type="button"
-          onClick={() => setShowPathModal(true)}
-          className="w-full py-2 px-3 rounded flex items-center justify-center gap-2 text-xs font-semibold transition-all duration-150"
-          style={{
-            fontFamily: '"IBM Plex Sans", sans-serif',
-            background: (userLinks.length > 0 || Object.values(reflections).some((t) => t?.trim()))
-              ? 'rgba(255, 215, 0, 0.15)'
-              : '#12121a',
-            border: '1px solid #1a1a30',
-            color: (userLinks.length > 0 || Object.values(reflections).some((t) => t?.trim()))
-              ? '#ffd700'
-              : '#c8c8d8',
-            boxShadow: (userLinks.length > 0 || Object.values(reflections).some((t) => t?.trim()))
-              ? '0 0 12px rgba(255, 215, 0, 0.3)'
-              : 'none',
-          }}
-          title="Download connections and reflections"
-        >
-          <span aria-hidden className="text-lg">🌌</span>
-          <span>path the stars</span>
         </button>
       </div>
 
@@ -687,6 +650,15 @@ export default function SpellwebViewerAgentic({
             <span style={{ width: 12, height: 2, background: '#444460', display: 'inline-block', borderRadius: 1 }} />
             <span>Grimoire</span>
           </div>
+          <button
+            type="button"
+            onClick={() => setShowPathModal(true)}
+            className="text-left text-xs mt-2 block hover:underline"
+            style={{ color: '#8888a0' }}
+            title="Export connections and reflections"
+          >
+            Export connections & reflections
+          </button>
         </div>
         {hoveredNode && (
           <div className="pt-3" style={{ borderTop: '1px solid #1a1a30' }}>
@@ -714,7 +686,7 @@ export default function SpellwebViewerAgentic({
       ? { background: '#06060e' }
       : { background: '#06060e', border: '1px solid #1a1a30' };
 
-  const graphWidth = fullscreen ? undefined : Math.max(100, size.width - 200);
+  const graphWidth = fullscreen ? undefined : size.width;
   const graphHeight = fullscreen ? undefined : size.height;
 
   return (
@@ -723,8 +695,8 @@ export default function SpellwebViewerAgentic({
       className={containerClass}
       style={{ ...containerStyle, ...(fullscreen ? {} : fullHeight ? { width: '100%', height: '100%' } : { minHeight: 520 }) }}
     >
-      {/* Graph area */}
-      <div className="flex-1 min-w-0 min-h-0 relative">
+      {/* One big screen: graph fills container */}
+      <div className="flex-1 min-w-0 min-h-0 relative w-full h-full">
         <ForceGraph2D
           key={layoutKey}
           ref={fgRef as any}
@@ -748,10 +720,53 @@ export default function SpellwebViewerAgentic({
           width={graphWidth}
           height={graphHeight}
         />
+        {/* Toggle to open sidebar - tab on the right edge */}
+        <button
+          type="button"
+          onClick={() => setSidebarOpen((o) => !o)}
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 py-4 px-2 rounded-l-lg shadow-lg transition-all duration-200"
+          style={{
+            background: sidebarOpen ? '#0c0c18' : 'rgba(12, 12, 24, 0.9)',
+            border: '1px solid #1a1a30',
+            borderRight: 'none',
+            color: sidebarOpen ? '#ffd700' : '#666680',
+            fontFamily: '"IBM Plex Sans", sans-serif',
+            fontSize: 11,
+          }}
+          title={sidebarOpen ? 'Close panel' : 'Open panel'}
+          aria-label={sidebarOpen ? 'Close panel' : 'Open panel'}
+        >
+          <span aria-hidden>{sidebarOpen ? '▶' : '◀'}</span>
+        </button>
       </div>
 
-      {/* Right panel */}
-      {rightPanel(fullscreen)}
+      {/* Sidebar overlay - opens over the graph like spellweb directory */}
+      {sidebarOpen && (
+        <>
+          <div
+            className="absolute inset-0 z-20"
+            aria-hidden
+            onClick={() => setSidebarOpen(false)}
+            style={{ background: 'transparent' }}
+          />
+          <div className="absolute right-0 top-0 bottom-0 z-30 w-[280px] max-w-[90vw] flex flex-col border-l border-[#1a1a30] shadow-[-4px_0_24px_rgba(0,0,0,0.4)]" style={{ background: '#0c0c18' }}>
+            <div className="flex-shrink-0 flex justify-end p-2">
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(false)}
+                className="p-1.5 rounded transition-colors hover:bg-[#1a1a30]"
+                style={{ color: '#666680', fontSize: 14 }}
+                aria-label="Close panel"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              {rightPanel(fullscreen)}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Path the Stars Modal - spellweb styled */}
       {showPathModal && (

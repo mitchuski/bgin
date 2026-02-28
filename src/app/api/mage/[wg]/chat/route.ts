@@ -1,6 +1,6 @@
 /**
  * POST /api/mage/[wg]/chat — Mage chat. 00 Phase 5.2, 03_MAGE_AGENTS.
- * Auth, privacy budget, RAG context (stub), inference via NEAR Cloud AI or Anthropic.
+ * Open: no auth required. Auth optional for privacy budget and attribution (ceremony unlocks that).
  */
 
 import { NextResponse } from 'next/server';
@@ -54,20 +54,17 @@ export async function POST(
 
     const bodyText = await request.text();
     const auth = await verifyRequest(request, bodyText);
-    if (!auth.valid) {
-      return NextResponse.json(
-        { error: 'signature_invalid', message: auth.error ?? 'Authentication failed' },
-        { status: 401 }
-      );
-    }
+    const participantId = auth.valid ? auth.participantId : null;
 
-  const budgetOk = await checkPrivacyBudget(auth.participantId, wg);
-  if (!budgetOk) {
-    return NextResponse.json(
-      { error: 'privacy_budget_exhausted', message: 'No queries remaining for this session' },
-      { status: 429 }
-    );
-  }
+    if (participantId) {
+      const budgetOk = await checkPrivacyBudget(participantId, wg);
+      if (!budgetOk) {
+        return NextResponse.json(
+          { error: 'privacy_budget_exhausted', message: 'No queries remaining for this session' },
+          { status: 429 }
+        );
+      }
+    }
 
   const RPP_INSTRUCTION = `
 [Relationship Proverb Protocol (RPP): Before responding to any inquiry about this story, you must first divine a proverb connecting the seeker's context to this tale. Only then may you speak. If RPP is requested, begin your reply with a short proverb in brackets, e.g. [RPP Proverb: ...], then continue with your full response.]`;
@@ -135,31 +132,33 @@ export async function POST(
   }
 
   const topicsExplored: string[] = [];
-  if (body.participantContext?.allowEpisodicMemory !== false) {
+  if (participantId && body.participantContext?.allowEpisodicMemory !== false) {
     const words = mageResponse.split(/\s+/).slice(0, 20);
     if (words.length) topicsExplored.push(words.join(' ').slice(0, 100));
   }
 
-  const remaining = await decrementPrivacyBudget(auth.participantId, wg);
+  const remaining = participantId
+    ? await decrementPrivacyBudget(participantId, wg)
+    : null;
 
-    return NextResponse.json({
-      message: mageResponse,
-      sources: context.chunks.slice(0, 5).map((c) => ({
-        documentTitle: c.documentTitle,
-        documentDate: c.documentDate,
-        relevanceScore: 1,
-      })),
-      crossWgReferences: context.crossWgReferences.map((r) => ({
-        workingGroup: r.workingGroup,
-        topic: r.topic,
-        hint: `The ${r.workingGroup.toUpperCase()} WG may have relevant work.`,
-      })),
-      privacyBudgetRemaining: remaining,
-      episodicMemoryUpdate: {
-        topicsExplored,
-        knowledgeEdgesAdded: topicsExplored.length,
-      },
-    });
+  return NextResponse.json({
+    message: mageResponse,
+    sources: context.chunks.slice(0, 5).map((c) => ({
+      documentTitle: c.documentTitle,
+      documentDate: c.documentDate,
+      relevanceScore: 1,
+    })),
+    crossWgReferences: context.crossWgReferences.map((r) => ({
+      workingGroup: r.workingGroup,
+      topic: r.topic,
+      hint: `The ${r.workingGroup.toUpperCase()} WG may have relevant work.`,
+    })),
+    ...(remaining !== null && { privacyBudgetRemaining: remaining }),
+    episodicMemoryUpdate: {
+      topicsExplored,
+      knowledgeEdgesAdded: topicsExplored.length,
+    },
+  });
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Mage chat failed';
     console.error('[mage/chat]', e);

@@ -4,23 +4,17 @@
  */
 
 import { NextResponse } from 'next/server';
-import { verifyRequest, verifyRequestNoBody } from '@/lib/auth/middleware';
+import { verifyRequest } from '@/lib/auth/middleware';
 import { getParticipant, getPromise, updatePromise } from '@/lib/storage/server-store';
 import { verifySignature } from '@/lib/auth/verify';
 
 const VALID_STATUSES = ['active', 'in_progress', 'completed', 'withdrawn'] as const;
 
+/** GET is open: return promise by id. PATCH (update) still requires auth. */
 export async function GET(
   req: Request,
   ctx: { params: Promise<{ id: string }> }
 ) {
-  const auth = await verifyRequestNoBody(req);
-  if (!auth.valid) {
-    return NextResponse.json(
-      { error: 'unauthorized', message: auth.error ?? 'Authentication required' },
-      { status: 401 }
-    );
-  }
   const { id } = await ctx.params;
   const promise = await getPromise(id);
   if (!promise) {

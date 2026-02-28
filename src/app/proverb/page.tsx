@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getParticipantId, signedFetch } from '@/lib/swordsman/signedFetch';
 import { BLOCK14_WORKING_GROUPS } from '@/lib/block14/sessions';
@@ -27,7 +26,6 @@ interface ProverbRow {
 }
 
 export default function ProverbPage() {
-  const router = useRouter();
   const [proverbs, setProverbs] = useState<ProverbRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterWg, setFilterWg] = useState<string | null>(null);
@@ -36,12 +34,6 @@ export default function ProverbPage() {
   const [castWg, setCastWg] = useState(BLOCK14_WORKING_GROUPS[0]?.id ?? 'ikp');
   const [castLoading, setCastLoading] = useState(false);
   const [castSuccess, setCastSuccess] = useState<string | null>(null);
-
-  useEffect(() => {
-    getParticipantId().then((id) => {
-      if (!id) router.replace('/ceremony');
-    });
-  }, [router]);
 
   useEffect(() => {
     const params = new URLSearchParams();

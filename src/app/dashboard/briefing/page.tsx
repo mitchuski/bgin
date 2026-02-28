@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { signedFetch, getParticipantId } from '@/lib/swordsman/signedFetch';
 import WGBadge from '@/components/shared/WGBadge';
 
 const WG_EMOJI: Record<string, string> = {
@@ -28,7 +27,6 @@ interface BriefingData {
 }
 
 function BriefingContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const meetingId = searchParams.get('meetingId') ?? 'block-14';
   const [briefing, setBriefing] = useState<BriefingData | null>(null);
@@ -36,23 +34,15 @@ function BriefingContent() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getParticipantId().then((id) => {
-      if (!id) {
-        setLoading(false);
-        router.replace('/ceremony');
-        return;
-      }
-      setLoading(true);
-      signedFetch(`/api/curation/briefing?meetingId=${encodeURIComponent(meetingId)}`, { method: 'GET' })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.sections) setBriefing(data);
-          else setError('Could not load briefing');
-        })
-        .catch((e) => setError(e instanceof Error ? e.message : 'Briefing failed'))
-        .finally(() => setLoading(false));
-    });
-  }, [router, meetingId]);
+    fetch(`/api/curation/briefing?meetingId=${encodeURIComponent(meetingId)}`, { method: 'GET' })
+      .then((res) => (res.ok ? res.json() : { sections: null }))
+      .then((data) => {
+        if (data.sections) setBriefing(data);
+        else setError('Could not load briefing');
+      })
+      .catch((e) => setError(e instanceof Error ? e.message : 'Briefing failed'))
+      .finally(() => setLoading(false));
+  }, [meetingId]);
 
   if (loading) {
     return (

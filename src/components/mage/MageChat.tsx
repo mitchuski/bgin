@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { signedFetch, getParticipantId } from '@/lib/swordsman/signedFetch';
 import { getEpisodicContextForPrompt, updateEpisodicMemory } from '@/lib/mage/episodicMemory';
 import { localDB } from '@/lib/storage/local';
@@ -21,7 +20,6 @@ interface Message {
 }
 
 export default function MageChat({ wg, embedded }: { wg: string; embedded?: boolean }) {
-  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,11 +45,8 @@ export default function MageChat({ wg, embedded }: { wg: string; embedded?: bool
   }, [wg]);
 
   useEffect(() => {
-    getParticipantId().then((id) => {
-      if (!id) router.replace('/ceremony');
-    });
     loadEpisodicContext();
-  }, [router, loadEpisodicContext]);
+  }, [loadEpisodicContext]);
 
   const sendMessage = useCallback(async () => {
     const text = input.trim();
@@ -63,14 +58,7 @@ export default function MageChat({ wg, embedded }: { wg: string; embedded?: bool
     setLoading(true);
 
     try {
-      const participantId = await getParticipantId();
-      if (!participantId) {
-        router.replace('/ceremony');
-        return;
-      }
-      if (!localDB) return;
-
-      const prefs = await localDB.privacyPreferences.get('default');
+      const prefs = localDB ? await localDB.privacyPreferences.get('default') : null;
       const conversationHistory = messages.map((m) => ({
         role: m.role,
         content: m.content,
@@ -86,10 +74,19 @@ export default function MageChat({ wg, embedded }: { wg: string; embedded?: bool
         useRpp,
       };
 
-      const res = await signedFetch(`/api/mage/${wg}/chat`, {
-        method: 'POST',
-        body: JSON.stringify(body),
-      });
+      let res: Response;
+      try {
+        res = await signedFetch(`/api/mage/${wg}/chat`, {
+          method: 'POST',
+          body: JSON.stringify(body),
+        });
+      } catch {
+        res = await fetch(`/api/mage/${wg}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+      }
 
       const data = await res.json();
 
@@ -112,12 +109,15 @@ export default function MageChat({ wg, embedded }: { wg: string; embedded?: bool
       setPrivacyBudgetRemaining(data.privacyBudgetRemaining ?? null);
 
       if (data.episodicMemoryUpdate?.topicsExplored?.length && (prefs?.allowEpisodicMemory ?? true)) {
-        await updateEpisodicMemory(participantId, wg, {
-          query: text,
-          topicsExplored: data.episodicMemoryUpdate.topicsExplored,
-          timestamp: new Date().toISOString(),
-        });
-        loadEpisodicContext();
+        const pid = await getParticipantId();
+        if (pid) {
+          await updateEpisodicMemory(pid, wg, {
+            query: text,
+            topicsExplored: data.episodicMemoryUpdate.topicsExplored,
+            timestamp: new Date().toISOString(),
+          });
+          loadEpisodicContext();
+        }
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to send');
@@ -126,7 +126,7 @@ export default function MageChat({ wg, embedded }: { wg: string; embedded?: bool
     } finally {
       setLoading(false);
     }
-  }, [input, loading, messages, wg, episodicContext, router, loadEpisodicContext]);
+  }, [input, loading, messages, wg, episodicContext, useRpp, loadEpisodicContext]);
 
   const openCastModal = useCallback((index: number) => {
     setCastModalIndex(index);
