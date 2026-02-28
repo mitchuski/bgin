@@ -35,24 +35,31 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/** Open: POST allowed without auth; unauthenticated casts stored as participantId 'anonymous'. */
 export async function POST(request: NextRequest) {
   try {
     const bodyText = await request.text();
     const auth = await verifyRequest(request, bodyText);
 
-    if (!auth.valid) {
-      return NextResponse.json(
-        { error: 'auth_failed', message: auth.error ?? 'Authentication failed' },
-        { status: 401 }
-      );
-    }
+    let participantId: string;
+    let participantTier: SpellbookEntryRow['participantTier'];
+    let attributionLevel: SpellbookEntryRow['attributionLevel'];
 
-    const participant = await getParticipant(auth.participantId);
-    if (!participant) {
-      return NextResponse.json(
-        { error: 'participant_not_found', message: 'Participant not found' },
-        { status: 404 }
-      );
+    if (auth.valid) {
+      const participant = await getParticipant(auth.participantId);
+      if (participant) {
+        participantId = auth.participantId;
+        participantTier = participant.trustTier;
+        attributionLevel = participant.attributionLevel;
+      } else {
+        participantId = 'anonymous';
+        participantTier = 'blade';
+        attributionLevel = 'anonymous';
+      }
+    } else {
+      participantId = 'anonymous';
+      participantTier = 'blade';
+      attributionLevel = 'anonymous';
     }
 
     let body: {
@@ -89,14 +96,14 @@ export async function POST(request: NextRequest) {
       sessionId,
       sessionTitle: sessionTitle ?? sessionId,
       workingGroup,
-      participantId: auth.participantId,
-      participantTier: participant.trustTier,
+      participantId,
+      participantTier,
       mageQuery,
       mageResponse,
       sources: sources ?? [],
       crossWgRefs: crossWgRefs ?? [],
       addedAt: new Date().toISOString(),
-      attributionLevel: participant.attributionLevel,
+      attributionLevel,
     };
 
     await addSpellbookEntry(entry);

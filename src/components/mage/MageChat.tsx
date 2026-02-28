@@ -139,21 +139,35 @@ export default function MageChat({ wg, embedded }: { wg: string; embedded?: bool
     if (!msg || msg.role !== 'mage') return;
     const prevMsg = castModalIndex > 0 ? messages[castModalIndex - 1] : null;
     const mageQuery = prevMsg?.role === 'participant' ? prevMsg.content : '';
+    const payload = {
+      sessionId,
+      sessionTitle,
+      workingGroup: sessionWg,
+      mageQuery,
+      mageResponse: msg.content,
+      sources: msg.sources ?? [],
+      crossWgRefs: msg.crossWgRefs ?? [],
+    };
     setCastLoading(true);
     setCastSuccess(null);
     try {
-      const res = await signedFetch('/api/spellbook/entries', {
-        method: 'POST',
-        body: JSON.stringify({
-          sessionId,
-          sessionTitle,
-          workingGroup: sessionWg,
-          mageQuery,
-          mageResponse: msg.content,
-          sources: msg.sources ?? [],
-          crossWgRefs: msg.crossWgRefs ?? [],
-        }),
-      });
+      let res: Response;
+      try {
+        res = await signedFetch('/api/spellbook/entries', { method: 'POST', body: JSON.stringify(payload) });
+      } catch {
+        res = await fetch('/api/spellbook/entries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      }
+      if (res.status === 401) {
+        res = await fetch('/api/spellbook/entries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      }
       if (res.ok) {
         if (castModalIndex !== null) setCastMessageIndices((prev) => (prev.includes(castModalIndex) ? prev : [...prev, castModalIndex]));
         setCastSuccess('Cast added to this session and to the ' + sessionWg.toUpperCase() + ' spellbook.');
@@ -182,21 +196,35 @@ export default function MageChat({ wg, embedded }: { wg: string; embedded?: bool
     const mageQuery = prevMsg?.role === 'participant' ? prevMsg.content : '';
     const g = BLOCK14_WORKING_GROUPS.find((x) => x.id === targetWg);
     const sessionTitle = g ? `${g.label} Spellbook` : `${targetWg.toUpperCase()} Spellbook`;
+    const payload = {
+      sessionId: `spellbook-${targetWg}`,
+      sessionTitle,
+      workingGroup: targetWg,
+      mageQuery,
+      mageResponse: msg.content,
+      sources: msg.sources ?? [],
+      crossWgRefs: msg.crossWgRefs ?? [],
+    };
     setCastSpellbookLoading(true);
     setCastSpellbookSuccess(null);
     try {
-      const res = await signedFetch('/api/spellbook/entries', {
-        method: 'POST',
-        body: JSON.stringify({
-          sessionId: `spellbook-${targetWg}`,
-          sessionTitle,
-          workingGroup: targetWg,
-          mageQuery,
-          mageResponse: msg.content,
-          sources: msg.sources ?? [],
-          crossWgRefs: msg.crossWgRefs ?? [],
-        }),
-      });
+      let res: Response;
+      try {
+        res = await signedFetch('/api/spellbook/entries', { method: 'POST', body: JSON.stringify(payload) });
+      } catch {
+        res = await fetch('/api/spellbook/entries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      }
+      if (res.status === 401) {
+        res = await fetch('/api/spellbook/entries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      }
       if (res.ok) {
         if (castSpellbookModalIndex !== null) setCastMessageIndices((prev) => (prev.includes(castSpellbookModalIndex) ? prev : [...prev, castSpellbookModalIndex]));
         setCastSpellbookSuccess('Added to ' + sessionTitle + '.');
