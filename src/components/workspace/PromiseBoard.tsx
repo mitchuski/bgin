@@ -45,7 +45,7 @@ export default function PromiseBoard({ wg }: { wg: string }) {
     setLoading(true);
     try {
       const res = await fetch(`/api/promises?wg=${encodeURIComponent(wg)}`, { method: 'GET' });
-      const data = await res.ok ? res.json() : { promises: [] };
+      const data: { promises?: PromiseRow[] } = res.ok ? await res.json() : { promises: [] };
       if (data.promises) setPromises(data.promises);
       setError(null);
     } catch (e) {
