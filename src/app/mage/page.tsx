@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { signedFetch, getParticipantId } from '@/lib/swordsman/signedFetch';
 import { localDB } from '@/lib/storage/local';
 import FeedCard from '@/components/dashboard/FeedCard';
 import type { FeedItem } from '@/app/api/curation/feed/route';
@@ -16,35 +14,30 @@ const WGS = [
 ] as const;
 
 export default function MageHubPage() {
-  const router = useRouter();
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [feedLoading, setFeedLoading] = useState(true);
   const [feedError, setFeedError] = useState<string | null>(null);
 
   useEffect(() => {
-    getParticipantId().then((id) => {
-      if (!id) {
-        setFeedLoading(false);
-        router.replace('/ceremony');
-        return;
-      }
-      if (!localDB) {
-        setFeedLoading(false);
-        return;
-      }
-      localDB.agentCard.toCollection().first().then((card) => {
-        const wgs = card?.workingGroups?.length ? card.workingGroups.join(',') : 'ikp,fase,cyber,governance';
-        signedFetch(`/api/curation/feed?workingGroups=${wgs}&limit=50&offset=0`, { method: 'GET' })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.items) setFeedItems(data.items);
-            else setFeedError('Could not load knowledge');
-          })
-          .catch((e) => setFeedError(e instanceof Error ? e.message : 'Failed'))
-          .finally(() => setFeedLoading(false));
-      });
+    const loadFeed = (workingGroups: string) => {
+      fetch(`/api/curation/feed?workingGroups=${workingGroups}&limit=50&offset=0`, { method: 'GET' })
+        .then((res) => (res.ok ? res.json() : { items: [] }))
+        .then((data) => {
+          if (data.items) setFeedItems(data.items);
+          else setFeedError('Could not load knowledge');
+        })
+        .catch((e) => setFeedError(e instanceof Error ? e.message : 'Failed'))
+        .finally(() => setFeedLoading(false));
+    };
+    if (!localDB) {
+      loadFeed('ikp,fase,governance,cyber');
+      return;
+    }
+    localDB.agentCard.toCollection().first().then((card) => {
+      const wgs = card?.workingGroups?.length ? card.workingGroups.join(',') : 'ikp,fase,cyber,governance';
+      loadFeed(wgs);
     });
-  }, [router]);
+  }, []);
 
   return (
     <main className="min-h-screen p-6 md:p-8 max-w-4xl mx-auto">

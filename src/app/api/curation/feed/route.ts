@@ -5,8 +5,6 @@
  */
 
 import { NextResponse } from 'next/server';
-import { verifyRequestNoBody } from '@/lib/auth/middleware';
-import { getParticipant } from '@/lib/storage/server-store';
 import { BGIN_DOCUMENTS_ALL, type BginDocument } from '@/lib/bgin/documents';
 
 export type FeedItemType =
@@ -46,25 +44,16 @@ function docToFeedItem(doc: BginDocument, index: number): FeedItem {
   };
 }
 
+/** Feed is open: no auth required. Query workingGroups or default to all WGs. */
 export async function GET(request: Request) {
-  const auth = await verifyRequestNoBody(request);
-  if (!auth.valid) {
-    return NextResponse.json(
-      { error: 'unauthorized', message: auth.error ?? 'Authentication required' },
-      { status: 401 }
-    );
-  }
-
-  const participant = await getParticipant(auth.participantId);
-  const wgs = participant?.workingGroups?.length
-    ? participant.workingGroups
-    : ['ikp', 'fase', 'cyber', 'governance'];
-
   const url = new URL(request.url);
   const limit = Math.min(Number(url.searchParams.get('limit')) || 20, 50);
   const offset = Number(url.searchParams.get('offset')) || 0;
   const workingGroupsParam = url.searchParams.get('workingGroups');
-  const groups = workingGroupsParam ? workingGroupsParam.split(',').map((g) => g.trim()) : wgs;
+  const defaultWgs = ['ikp', 'fase', 'cyber', 'governance'];
+  const groups = workingGroupsParam
+    ? workingGroupsParam.split(',').map((g) => g.trim()).filter(Boolean)
+    : defaultWgs;
 
   const feedItems: FeedItem[] = BGIN_DOCUMENTS_ALL
     .filter((doc) => groups.includes(doc.workingGroup))

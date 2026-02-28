@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { signedFetch, getParticipantId } from '@/lib/swordsman/signedFetch';
+import { getParticipantId } from '@/lib/swordsman/signedFetch';
 import WGBadge from '@/components/shared/WGBadge';
 
 const WG_EMOJI: Record<string, string> = {
@@ -30,29 +30,22 @@ export default function HomePromiseBoard() {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    getParticipantId().then((pid) => {
-      if (!pid) {
-        setAuthenticated(false);
-        setLoading(false);
-        return;
-      }
-      setAuthenticated(true);
-      Promise.all(
-        WGS.map((wg) =>
-          signedFetch(`/api/promises?wg=${encodeURIComponent(wg)}`, { method: 'GET' })
-            .then((r) => r.json())
-            .then((d) => (d.promises ?? []) as PromiseRow[])
-            .catch(() => [] as PromiseRow[])
-        )
+    getParticipantId().then((pid) => setAuthenticated(!!pid));
+    Promise.all(
+      WGS.map((wg) =>
+        fetch(`/api/promises?wg=${encodeURIComponent(wg)}`, { method: 'GET' })
+          .then((r) => (r.ok ? r.json() : { promises: [] }))
+          .then((d) => (d.promises ?? []) as PromiseRow[])
+          .catch(() => [] as PromiseRow[])
       )
-        .then((arrays) => {
-          const merged = arrays.flat();
-          merged.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-          setPromises(merged.slice(0, 15));
-        })
-        .catch(() => setPromises([]))
-        .finally(() => setLoading(false));
-    });
+    )
+      .then((arrays) => {
+        const merged = arrays.flat();
+        merged.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setPromises(merged.slice(0, 15));
+      })
+      .catch(() => setPromises([]))
+      .finally(() => setLoading(false));
   }, []);
 
   return (

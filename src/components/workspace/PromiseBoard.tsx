@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { signedFetch, getParticipantId } from '@/lib/swordsman/signedFetch';
+import { getParticipantId } from '@/lib/swordsman/signedFetch';
 import { createPromise, updatePromiseStatus } from '@/lib/promises/client';
 import type { PromiseType } from '@/lib/promises/types';
 import PromiseCard from './PromiseCard';
@@ -42,14 +42,10 @@ export default function PromiseBoard({ wg }: { wg: string }) {
   const fetchPromises = useCallback(async () => {
     const pid = await getParticipantId();
     setParticipantId(pid);
-    if (!pid) {
-      setLoading(false);
-      return;
-    }
     setLoading(true);
     try {
-      const res = await signedFetch(`/api/promises?wg=${encodeURIComponent(wg)}`, { method: 'GET' });
-      const data = await res.json();
+      const res = await fetch(`/api/promises?wg=${encodeURIComponent(wg)}`, { method: 'GET' });
+      const data = await res.ok ? res.json() : { promises: [] };
       if (data.promises) setPromises(data.promises);
       setError(null);
     } catch (e) {

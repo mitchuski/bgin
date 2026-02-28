@@ -32,15 +32,8 @@ function canonicalPromisePayload(body: {
   });
 }
 
+/** GET is open: list promises without auth. POST (create) still requires ceremony + register for attribution. */
 export async function GET(request: Request) {
-  const auth = await verifyRequestNoBody(request);
-  if (!auth.valid) {
-    return NextResponse.json(
-      { error: 'unauthorized', message: auth.error ?? 'Authentication required' },
-      { status: 401 }
-    );
-  }
-
   const url = new URL(request.url);
   const wg = (url.searchParams.get('wg') ?? '').toLowerCase();
   if (!VALID_WGS.includes(wg)) {
