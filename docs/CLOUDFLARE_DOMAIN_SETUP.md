@@ -22,6 +22,23 @@ After deploy you get a `*.workers.dev` URL. For production, use a custom domain 
 
 ---
 
+## 1b. Environment variables (required for Mage and APIs)
+
+For **Mage chat**, **curation feed**, and **promises** to work, the Worker needs at least one inference key. Set them in the dashboard so the app does not return 401/500 for those features:
+
+1. [Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers-and-pages) → **bginai** → **Settings** → **Variables and Secrets**.
+2. Add **Environment variables** (or **Encrypted secrets** for keys):
+   - **NEAR_AI_API_KEY** — NEAR Cloud AI key (recommended), or
+   - **ANTHROPIC_API_KEY** — Anthropic API key (e.g. Claude).
+3. Optional: **NEAR_AI_MODEL**, **ANTHROPIC_MAGE_MODEL** (see `.env.example`).
+4. Redeploy the Worker after changing variables.
+
+Without at least one of these, Mage chat and some API routes will fail. **Ceremony/register** and **Spellbook (list)** work without them; **401** on other routes usually means the user has not completed the ceremony (no identity) or the key is missing on the server.
+
+For full details on how the Mage uses these keys at runtime and how deployment affects it, see **[MAGE_DEPLOYMENT.md](./MAGE_DEPLOYMENT.md)**.
+
+---
+
 ## 2. Add Your Domain in Cloudflare
 
 Your domain must be on Cloudflare (added as a zone). If it isn’t yet:

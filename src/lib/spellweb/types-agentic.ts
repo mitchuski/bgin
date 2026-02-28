@@ -17,6 +17,7 @@ export type SpellwebLinkType =
   | 'cluster'       // Session hub → spell (cast to session)
   | 'sequence'      // spell → spell (casting order in session)
   | 'constellation' // spell → topic (cross-WG) or spell → proverb
+  | 'connection'    // User connection (Connect / Reflect in Web UI)
   | 'drawn'         // User-drawn link in draw mode
   | 'saved';        // User-saved link (persisted to localStorage)
 

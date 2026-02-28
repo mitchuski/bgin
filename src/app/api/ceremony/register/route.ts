@@ -42,33 +42,57 @@ export async function POST(request: Request) {
     );
   }
 
-  const { signature: _sig, ...cardPayload } = card;
-  const cardJson = JSON.stringify(cardPayload);
-  const valid = await verifySignature(card.publicKeyHex, cardJson, card.signature);
-  if (!valid) {
+  try {
+    // Build payload in same key order as client (createAgentCard) so signature verification matches
+    const payloadForVerification = {
+      version: card.version ?? '1.0',
+      type: card.type ?? 'swordsman',
+      participantId: card.participantId,
+      ...(card.displayName !== undefined && card.displayName !== '' ? { displayName: String(card.displayName).trim() } : {}),
+      publicKeyHex: card.publicKeyHex,
+      createdAt: card.createdAt,
+      privacy: card.privacy ?? { attributionLevel: 'anonymous' as const, maxQueriesPerSession: 16 },
+      workingGroups: Array.isArray(card.workingGroups) ? card.workingGroups : [],
+      trustTier: card.trustTier ?? 'blade',
+    };
+    const cardJson = JSON.stringify(payloadForVerification);
+    const valid = await verifySignature(card.publicKeyHex, cardJson, card.signature);
+    if (!valid) {
+      return NextResponse.json(
+        { error: 'signature_invalid', message: 'Agent card signature verification failed' },
+        { status: 400 }
+      );
+    }
+
+    const attributionLevel = card.privacy?.attributionLevel;
+    const safeAttribution = attributionLevel === 'full' || attributionLevel === 'role_only' || attributionLevel === 'anonymous'
+      ? attributionLevel
+      : 'anonymous';
+
+    await upsertParticipant({
+      participantId: card.participantId,
+      displayName: card.displayName?.trim() || undefined,
+      publicKeyHex: card.publicKeyHex,
+      trustTier: 'blade',
+      workingGroups: Array.isArray(card.workingGroups) ? card.workingGroups : [],
+      attributionLevel: safeAttribution,
+      maxQueriesPerSession: card.privacy?.maxQueriesPerSession ?? 16,
+      registeredAt: card.createdAt ?? new Date().toISOString(),
+    });
+
     return NextResponse.json(
-      { error: 'signature_invalid', message: 'Agent card signature verification failed' },
-      { status: 400 }
+      {
+        participantId: card.participantId,
+        registered: true,
+        connectedMages: Array.isArray(card.workingGroups) ? card.workingGroups : [],
+      },
+      { status: 201 }
+    );
+  } catch (err) {
+    console.error('[ceremony/register]', err);
+    return NextResponse.json(
+      { error: 'registration_failed', message: 'Registration failed. Please try again or complete the ceremony locally first.' },
+      { status: 500 }
     );
   }
-
-  await upsertParticipant({
-    participantId: card.participantId,
-    displayName: card.displayName?.trim() || undefined,
-    publicKeyHex: card.publicKeyHex,
-    trustTier: 'blade',
-    workingGroups: card.workingGroups ?? [],
-    attributionLevel: card.privacy?.attributionLevel ?? 'anonymous',
-    maxQueriesPerSession: card.privacy?.maxQueriesPerSession ?? 16,
-    registeredAt: card.createdAt ?? new Date().toISOString(),
-  });
-
-  return NextResponse.json(
-    {
-      participantId: card.participantId,
-      registered: true,
-      connectedMages: card.workingGroups ?? [],
-    },
-    { status: 201 }
-  );
 }

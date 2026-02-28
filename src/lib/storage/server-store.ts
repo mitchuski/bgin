@@ -121,6 +121,9 @@ const emptyStore: Store = {
   proverbs: [],
 };
 
+/** In-memory fallback when fs is unavailable (e.g. Cloudflare Workers). Data does not persist across cold starts. */
+let memoryStore: Store | null = null;
+
 async function load(): Promise<Store> {
   try {
     const raw = await readFile(STORE_PATH, 'utf-8');
@@ -134,13 +137,18 @@ async function load(): Promise<Store> {
       proverbs: parsed.proverbs ?? emptyStore.proverbs,
     };
   } catch {
-    return { ...emptyStore };
+    if (!memoryStore) memoryStore = JSON.parse(JSON.stringify(emptyStore)) as Store;
+    return JSON.parse(JSON.stringify(memoryStore)) as Store;
   }
 }
 
 async function save(store: Store): Promise<void> {
-  await mkdir(DATA_DIR, { recursive: true });
-  await writeFile(STORE_PATH, JSON.stringify(store, null, 2), 'utf-8');
+  try {
+    await mkdir(DATA_DIR, { recursive: true });
+    await writeFile(STORE_PATH, JSON.stringify(store, null, 2), 'utf-8');
+  } catch {
+    memoryStore = JSON.parse(JSON.stringify(store)) as Store;
+  }
 }
 
 export async function getParticipant(participantId: string): Promise<ParticipantRow | null> {

@@ -5,9 +5,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getParticipantId } from '@/lib/swordsman/signedFetch';
-import GlyphInspector from '@/components/spellbook/GlyphInspector';
 import { BLOCK14_WORKING_GROUPS } from '@/lib/block14/sessions';
-import type { Glyph } from '@/lib/spellweb/types';
 import type { SpellbookEntryInput } from '@/lib/spellweb/builder';
 import type { ProverbInput } from '@/lib/spellweb/builder-agentic';
 import { buildAgenticSpellweb } from '@/lib/spellweb/builder-agentic';
@@ -25,17 +23,20 @@ const SpellwebViewerAgentic = dynamic(
   }
 );
 
+// WG color mapping for legend
+const WG_COLORS: Record<string, string> = {
+  ikp: '#3B82F6',
+  fase: '#8B5CF6',
+  cyber: '#10B981',
+  governance: '#F59E0B',
+};
+
 export default function WebPage() {
   const router = useRouter();
   const [entries, setEntries] = useState<SpellbookEntryInput[]>([]);
   const [proverbs, setProverbs] = useState<ProverbInput[]>([]);
-  const [selectedGlyph, setSelectedGlyph] = useState<Glyph | null>(null);
-  const [grimoireFilter, setGrimoireFilter] = useState<string[]>(
-    BLOCK14_WORKING_GROUPS.map((g) => g.id)
-  );
   const [loading, setLoading] = useState(true);
   const [usingDummyData, setUsingDummyData] = useState(false);
-  const [legendOpen, setLegendOpen] = useState(false);
 
   useEffect(() => {
     getParticipantId().then((id) => {
@@ -72,7 +73,7 @@ export default function WebPage() {
     fetchData();
   }, [fetchData]);
 
-  // Refetch when page becomes visible (e.g. after inscribing a proverb elsewhere) so new proverb nodes appear on the Web
+  // Refetch when page becomes visible
   useEffect(() => {
     const onVisible = () => {
       if (document.visibilityState === 'visible') fetchData();
@@ -86,15 +87,12 @@ export default function WebPage() {
     [entries, proverbs]
   );
 
-  const toggleGrimoire = (wg: string) => {
-    setGrimoireFilter((prev) =>
-      prev.includes(wg) ? prev.filter((g) => g !== wg) : [...prev, wg]
-    );
-  };
+  // All WGs always shown
+  const allWgIds = BLOCK14_WORKING_GROUPS.map((g) => g.id);
 
   return (
-    <main className="flex flex-col h-[calc(100vh-3.5rem)] min-h-0">
-      {/* Slim top bar */}
+    <main className="flex flex-col flex-1 min-h-0">
+      {/* Top bar */}
       <div className="flex-shrink-0 flex flex-wrap items-center justify-between gap-2 px-4 py-2 border-b border-[var(--border)] bg-[var(--bg-secondary)]">
         <div className="flex items-center gap-3">
           <Link
@@ -112,96 +110,40 @@ export default function WebPage() {
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        {/* Legend: WG colors + emoji (display only, no toggle) */}
+        <div className="flex items-center gap-3">
           {BLOCK14_WORKING_GROUPS.map((g) => (
-            <button
+            <div
               key={g.id}
-              type="button"
-              onClick={() => toggleGrimoire(g.id)}
-              className={`px-2.5 py-1 rounded-md border text-xs transition-colors ${
-                grimoireFilter.includes(g.id)
-                  ? 'border-[var(--mage)] bg-[var(--mage)]/10 text-[var(--text-primary)]'
-                  : 'border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-muted)]'
-              }`}
+              className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]"
             >
-              {g.emoji} {g.label}
-            </button>
+              <span
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: WG_COLORS[g.id] }}
+              />
+              <span>{g.emoji}</span>
+              <span>{g.label}</span>
+            </div>
           ))}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setLegendOpen((o) => !o)}
-              className="px-2.5 py-1 rounded-md border border-[var(--border)] bg-[var(--bg-primary)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-            >
-              Legend
-            </button>
-            {legendOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  aria-hidden
-                  onClick={() => setLegendOpen(false)}
-                />
-                <div className="absolute right-0 top-full mt-1 z-20 w-56 p-3 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] shadow-lg text-xs text-[var(--text-secondary)]">
-                  <div className="grid gap-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full bg-[#3B82F6]" /> IKP
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full bg-[#8B5CF6]" /> FASE
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full bg-[#10B981]" /> Cyber
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full bg-[#F59E0B]" /> Governance
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span>✦</span> Proverb
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-4 h-0.5 bg-[#f59e0b]" /> Constellation
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-4 h-0.5 border-t border-dashed border-[#94a3b8]" /> Sequence
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
+          <div className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
+            <span>✦</span>
+            <span>Proverb</span>
           </div>
         </div>
       </div>
 
-      {/* Full-height graph + optional inspector */}
-      <div className="flex-1 min-h-0 flex relative">
-        <div className="flex-1 min-w-0 min-h-0">
-          {loading ? (
-            <div className="flex items-center justify-center h-full text-[var(--text-muted)]">
-              Weaving the Web…
-            </div>
-          ) : (
-            <SpellwebViewerAgentic
-              data={spellwebData}
-              grimoireFilter={grimoireFilter}
-              onGlyphSelect={setSelectedGlyph}
-              fullHeight
-            />
-          )}
-        </div>
-        {selectedGlyph && (
-          <div className="absolute top-2 right-2 bottom-2 w-80 max-w-[90vw] z-20 shadow-lg rounded-lg overflow-hidden border border-[var(--border)] bg-[var(--bg-secondary)]">
-            <div className="h-full overflow-auto">
-              <GlyphInspector glyph={selectedGlyph} />
-            </div>
-            <button
-              type="button"
-              onClick={() => setSelectedGlyph(null)}
-              className="absolute top-2 right-2 rounded border border-[var(--border)] bg-[var(--bg-primary)] px-2 py-1 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-            >
-              Close
-            </button>
+      {/* Full-height graph with integrated right panel */}
+      <div className="flex-1 min-h-0">
+        {loading ? (
+          <div className="flex items-center justify-center h-full text-[var(--text-muted)]">
+            Weaving the Web…
           </div>
+        ) : (
+          <SpellwebViewerAgentic
+            data={spellwebData}
+            grimoireFilter={allWgIds}
+            fullHeight
+          />
         )}
       </div>
     </main>

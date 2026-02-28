@@ -42,23 +42,24 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ wg: string }> }
 ) {
-  const { wg: wgParam } = await params;
-  const wg = wgParam?.toLowerCase() ?? '';
-  if (!VALID_WGS.includes(wg)) {
-    return NextResponse.json(
-      { error: 'invalid_wg', message: 'Unknown working group' },
-      { status: 400 }
-    );
-  }
+  try {
+    const { wg: wgParam } = await params;
+    const wg = wgParam?.toLowerCase() ?? '';
+    if (!VALID_WGS.includes(wg)) {
+      return NextResponse.json(
+        { error: 'invalid_wg', message: 'Unknown working group' },
+        { status: 400 }
+      );
+    }
 
-  const bodyText = await request.text();
-  const auth = await verifyRequest(request, bodyText);
-  if (!auth.valid) {
-    return NextResponse.json(
-      { error: 'signature_invalid', message: auth.error ?? 'Authentication failed' },
-      { status: 401 }
-    );
-  }
+    const bodyText = await request.text();
+    const auth = await verifyRequest(request, bodyText);
+    if (!auth.valid) {
+      return NextResponse.json(
+        { error: 'signature_invalid', message: auth.error ?? 'Authentication failed' },
+        { status: 401 }
+      );
+    }
 
   const budgetOk = await checkPrivacyBudget(auth.participantId, wg);
   if (!budgetOk) {
@@ -141,22 +142,30 @@ export async function POST(
 
   const remaining = await decrementPrivacyBudget(auth.participantId, wg);
 
-  return NextResponse.json({
-    message: mageResponse,
-    sources: context.chunks.slice(0, 5).map((c) => ({
-      documentTitle: c.documentTitle,
-      documentDate: c.documentDate,
-      relevanceScore: 1,
-    })),
-    crossWgReferences: context.crossWgReferences.map((r) => ({
-      workingGroup: r.workingGroup,
-      topic: r.topic,
-      hint: `The ${r.workingGroup.toUpperCase()} WG may have relevant work.`,
-    })),
-    privacyBudgetRemaining: remaining,
-    episodicMemoryUpdate: {
-      topicsExplored,
-      knowledgeEdgesAdded: topicsExplored.length,
-    },
-  });
+    return NextResponse.json({
+      message: mageResponse,
+      sources: context.chunks.slice(0, 5).map((c) => ({
+        documentTitle: c.documentTitle,
+        documentDate: c.documentDate,
+        relevanceScore: 1,
+      })),
+      crossWgReferences: context.crossWgReferences.map((r) => ({
+        workingGroup: r.workingGroup,
+        topic: r.topic,
+        hint: `The ${r.workingGroup.toUpperCase()} WG may have relevant work.`,
+      })),
+      privacyBudgetRemaining: remaining,
+      episodicMemoryUpdate: {
+        topicsExplored,
+        knowledgeEdgesAdded: topicsExplored.length,
+      },
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Mage chat failed';
+    console.error('[mage/chat]', e);
+    return NextResponse.json(
+      { error: 'mage_error', message: msg },
+      { status: 502 }
+    );
+  }
 }

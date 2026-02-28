@@ -3,26 +3,124 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #12121a;
-  --bg-tertiary: #1a1a28;
-  --border: #2a2a3a;
-  --text-primary: #e8e8f0;
+  /* Spellweb-aligned background colors */
+  --bg-primary: #06060e;
+  --bg-panel: #0c0c18;
+  --bg-secondary: #0c0c18;
+  --bg-tertiary: #12121a;
+  --border: #1a1a30;
+  --panel-border: #1a1a30;
+
+  /* Spellweb-aligned text colors */
+  --text-primary: #c8c8d8;
   --text-secondary: #8888a0;
-  --text-muted: #555570;
+  --text-dim: #666680;
+  --text-muted: #666680;
+  --text-bright: #e8e8f0;
+
+  /* Accent - Gold primary */
+  --accent: #ffd700;
+  --accent-dim: rgba(255, 215, 0, 0.25);
+
+  /* Working Group colors (preserved) */
   --wg-ikp: #7c6bff;
   --wg-fase: #4ecdc4;
   --wg-cyber: #ff6b6b;
   --wg-governance: #ffd93d;
+
+  /* Trust tiers (preserved) */
   --tier-blade: #666680;
   --tier-light: #7c6bff;
   --tier-heavy: #4ecdc4;
   --tier-dragon: #ffd93d;
-  --swordsman: #ff6b6b;
-  --mage: #7c6bff;
+
+  /* Domain colors (spellweb-aligned) */
+  --swordsman: #e94560;
+  --swordsman-fill: #8b1a2b;
+  --mage: #7b68ee;
+  --mage-fill: #3b2d7a;
+  --first-person: #ffd700;
+  --first-person-fill: #6b5a00;
+  --shared: #00d9ff;
+  --shared-fill: #0a4a5c;
+
+  /* Typography */
+  font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
 }
 
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
+}
+
+/* Utility classes for spellweb styling */
+.font-display {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Glow effects */
+.glow {
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
+.glow-strong {
+  filter: drop-shadow(0 0 12px currentColor);
+}
+
+/* Spellweb button base styles */
+.btn-filter {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-dim);
+  padding: 5px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-filter:hover {
+  border-color: var(--border);
+}
+
+.btn-filter.active {
+  background: rgba(255, 215, 0, 0.09);
+  border-color: rgba(255, 215, 0, 0.25);
+  color: var(--accent);
+}
+
+.btn-action {
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-action.primary {
+  background: #2ecc71;
+  border: none;
+  color: #000;
+}
+
+.btn-action.primary:disabled {
+  background: rgba(46, 204, 113, 0.25);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
+}
+
+.btn-action.secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+.btn-action.secondary:hover {
+  border-color: rgba(255, 215, 0, 0.4);
 }

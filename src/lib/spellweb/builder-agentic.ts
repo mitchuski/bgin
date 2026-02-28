@@ -6,7 +6,14 @@
 import type { SpellbookEntryInput } from './builder';
 import type { SpellwebData, SpellwebNode, SpellwebLink } from './types-agentic';
 import type { Glyph } from './types';
-import { BLOCK14_WORKING_GROUPS } from '@/lib/block14/sessions';
+import { BLOCK14_WORKING_GROUPS, BLOCK14_TIMETABLE } from '@/lib/block14/sessions';
+
+/** One spell emoji per Block 14 session, shown on session nodes in the spellweb. */
+const SESSION_SPELL_EMOJI: Record<string, string> = {};
+const SPELL_EMOJIS = ['📜', '✨', '🔮', '🌟', '💫', '⭐', '🌙', '☀️', '🎯', '🗝️', '📿', '🕯️', '🌠', '🔯', '🌀', '🌊', '🔥', '🌿', '🍃', '🦋'];
+BLOCK14_TIMETABLE.forEach((s, i) => {
+  SESSION_SPELL_EMOJI[s.id] = SPELL_EMOJIS[i % SPELL_EMOJIS.length];
+});
 
 /** Proverb from API (RPP — linked to cast when castEntryId is set). */
 export interface ProverbInput {
@@ -86,7 +93,7 @@ export function buildAgenticSpellweb(
       nodes.push({
         id,
         type: 'session',
-        emoji: '📅',
+        emoji: SESSION_SPELL_EMOJI[sessionId] ?? '📅',
         label: first.sessionTitle.slice(0, 30) + (first.sessionTitle.length > 30 ? '…' : ''),
         fullTitle: first.sessionTitle,
         val: 16,
@@ -107,7 +114,7 @@ export function buildAgenticSpellweb(
     nodes.push({
       id: spellId,
       type: 'spell',
-      emoji: '✨',
+      emoji: SESSION_SPELL_EMOJI[entry.sessionId] ?? '✨',
       label: entry.mageQuery.slice(0, 35) + (entry.mageQuery.length > 35 ? '…' : ''),
       fullTitle: entry.mageQuery,
       name: shortLabel(sequenceNumber),
